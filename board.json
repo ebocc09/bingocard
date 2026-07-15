@@ -1,30 +1,8 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784144014412,
-  "exportedAt": "2026-07-15T19:35:36.280Z",
-  "tasks": [
-    {
-      "id": "t_mrmh6oew_iq8kqc",
-      "name": "test",
-      "description": "test",
-      "completed": true,
-      "createdAt": 1784143854104
-    },
-    {
-      "id": "t_mrmh8fl3_ljksry",
-      "name": "one",
-      "description": "two",
-      "completed": true,
-      "createdAt": 1784143935975
-    },
-    {
-      "id": "t_mrmha43w_bnov3k",
-      "name": "plates",
-      "description": "audit plates",
-      "completed": false,
-      "createdAt": 1784144014412
-    }
-  ],
+  "updatedAt": 0,
+  "boardGeneration": 0,
+  "tasks": [],
   "savedTasks": []
 }

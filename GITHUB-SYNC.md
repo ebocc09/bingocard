@@ -45,21 +45,36 @@ https://YOURUSER.github.io/YOURREPO/
 > Do **not** commit the token into the repo or paste it into `index.html`.  
 > Each person stores it only in their browser via **Connect GitHub**.
 
-### 3. Each team member connects (once per browser)
+### 3. Admin connects GitHub (once per browser that will save)
+
+GitHub controls are **only in the admin panel** (not on the public page).
 
 1. Open the live Pages URL  
-2. Click **Connect GitHub**  
-3. Confirm:
+2. Click 🗝️ → password **`salem1692`**  
+3. Click **Connect GitHub**  
+4. Confirm:
    - Owner = your GitHub username (or org)
    - Repo = repository name  
    - Path = `board.json`  
    - Branch = `main` (or `master`)  
-4. Paste the **token**  
-5. **Save & Connect**
+5. Paste the **token**  
+6. **Save & Connect**
 
-Status should show: **`Live · GitHub · [time]`**
+Status (top left) should show: **`Live · GitHub · [time]`**
 
 The first save creates/updates `board.json` in the repo (you'll see commits like *Update Tonight's Tasks board*).
+
+**Players** only open the URL and use the board — they don’t see GitHub settings.  
+Anyone who needs to **save** completions/adds needs a token connected (admin panel), or you share one admin machine that stays open as “host”. For true multi-writer, each writer connects their own token in admin once.
+
+### Multi-user safety
+
+The app **merges** boards instead of overwriting:
+- Completions stick (if anyone marks complete, it stays complete)
+- New tasks from both people are kept
+- **Reset** bumps a generation counter so old tasks don’t reappear after a clear
+
+Still avoid two people editing the *same task text* at the exact same second — last field edit wins for name/description.
 
 ---
 
