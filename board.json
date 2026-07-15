@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784148501084,
+  "updatedAt": 1784148538485,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-15T20:48:21.084Z",
+  "exportedAt": "2026-07-15T20:48:58.486Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -52,6 +52,14 @@
       "completed": false,
       "createdAt": 1784148499726,
       "updatedAt": 1784148499726
+    },
+    {
+      "id": "t_mrmjz1y5_eegu2g",
+      "name": "Pull-Onsite all cars for the day after tomorrow",
+      "description": "",
+      "completed": false,
+      "createdAt": 1784148537245,
+      "updatedAt": 1784148537245
     }
   ],
   "savedTasks": [
