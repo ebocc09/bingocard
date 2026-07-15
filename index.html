@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tonight's Tasks — Bingo Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Special+Elite&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1209;
+      --ink-soft: #3d2b1f;
+      --blood: #6b1c1c;
+      --blood-bright: #8b2a2a;
+      --parchment: #e8d5b5;
+      --parchment-deep: #a68b5b;
+      --wood: #2c1810;
+      --wood-mid: #3d2317;
+      --gold: #b8860b;
+      --gold-light: #d4a84b;
+      --stamp: #5c1a1a;
+      --shadow: rgba(20, 10, 5, 0.55);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "IM Fell English", Georgia, serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(80, 40, 20, 0.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(40, 15, 10, 0.5) 0%, transparent 45%),
+        linear-gradient(160deg, #1a0f0a 0%, #2a1810 35%, #1c100c 70%, #0f0806 100%);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.07;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      min-height: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .sync-status {
+      font-family: "Special Elite", monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(212, 168, 75, 0.55);
+      padding-top: 0.2rem;
+    }
+
+    .sync-status.ok { color: rgba(140, 180, 100, 0.85); }
+    .sync-status.err { color: rgba(200, 100, 80, 0.9); }
+    .sync-status.busy { color: rgba(212, 168, 75, 0.9); }
+
+    .progress-wrap {
+      display: none;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
+      min-width: 180px;
+      max-width: 240px;
+    }
+
+    .progress-wrap.visible { display: flex; }
+
+    .progress-label {
+      font-family: "Special Elite", monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background: rgba(20, 10, 5, 0.7);
+      border: 1px solid var(--gold);
+      border-radius: 2px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 0 8px rgba(184, 134, 11, 0.25);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blood) 0%, var(--blood-bright) 50%, #a33 100%);
+      transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 0 10px rgba(139, 42, 42, 0.6);
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+    }
+
+    .bingo-card {
+      position: relative;
+      background: linear-gradient(135deg, rgba(232, 213, 181, 0.97) 0%, rgba(212, 184, 140, 0.98) 40%, rgba(196, 165, 116, 0.96) 100%);
+      border: 4px double var(--ink-soft);
+      border-radius: 4px;
+      padding: 1.75rem 1.5rem 2rem;
+      box-shadow:
+        0 0 0 3px var(--wood-mid),
+        0 0 0 6px var(--parchment-deep),
+        0 20px 50px var(--shadow),
+        inset 0 0 80px rgba(120, 80, 40, 0.15);
+      transform: rotate(-0.3deg);
+    }
+
+    .bingo-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: 2px;
+      opacity: 0.35;
+      background:
+        radial-gradient(ellipse at 10% 20%, rgba(100, 60, 20, 0.2) 0%, transparent 40%),
+        radial-gradient(ellipse at 90% 80%, rgba(80, 40, 15, 0.18) 0%, transparent 35%),
+        radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(90, 50, 20, 0.12) 100%);
+      mix-blend-mode: multiply;
+    }
+
+    .bingo-card::after {
+      content: "✧";
+      position: absolute;
+      top: 0.6rem;
+      left: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--stamp);
+      opacity: 0.45;
+    }
+
+    .card-corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: var(--stamp);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .card-corner.tl { top: 10px; left: 10px; border-top: 2px solid; border-left: 2px solid; }
+    .card-corner.tr { top: 10px; right: 10px; border-top: 2px solid; border-right: 2px solid; }
+    .card-corner.bl { bottom: 10px; left: 10px; border-bottom: 2px solid; border-left: 2px solid; }
+    .card-corner.br { bottom: 10px; right: 10px; border-bottom: 2px solid; border-right: 2px solid; }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-date {
+      font-family: "Cinzel", serif;
+      font-weight: 700;
+      font-size: clamp(1.1rem, 3.5vw, 1.55rem);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+
+    .card-title {
+      font-family: "Cinzel", serif;
+      font-weight: 600;
+      font-size: clamp(1.4rem, 4.5vw, 2rem);
+      letter-spacing: 0.08em;
+      color: var(--blood);
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .title-rule {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .title-rule span {
+      display: block;
+      height: 1px;
+      width: 60px;
+      background: linear-gradient(90deg, transparent, var(--ink-soft), transparent);
+    }
+
+    .title-rule i {
+      font-style: normal;
+      font-size: 0.7rem;
+      color: var(--stamp);
+      opacity: 0.7;
+    }
+
+    .bingo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+      position: relative;
+      z-index: 1;
+      min-height: 200px;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--ink-soft);
+      opacity: 0.65;
+    }
+
+    .empty-state .sigil {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-style: italic;
+      font-size: 1.15rem;
+      line-height: 1.5;
+    }
+
+    .empty-state .hint {
+      margin-top: 0.75rem;
+      font-family: "Special Elite", monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .task-cell {
+      position: relative;
+      aspect-ratio: 1;
+      min-height: 120px;
+      background: linear-gradient(160deg, rgba(250, 240, 220, 0.55) 0%, rgba(220, 195, 155, 0.4) 100%);
+      border: 2px solid var(--ink-soft);
+      border-radius: 2px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.65rem;
+      text-align: center;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: inset 0 0 20px rgba(100, 70, 30, 0.08);
+      user-select: none;
+      gap: 0.35rem;
+    }
+
+    .task-cell:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 14px rgba(40, 20, 10, 0.25), inset 0 0 20px rgba(100, 70, 30, 0.08);
+      border-color: var(--blood);
+    }
+
+    .task-cell:active { transform: scale(0.98); }
+
+    .task-cell .task-name {
+      font-family: "Cinzel", serif;
+      font-weight: 600;
+      font-size: clamp(0.78rem, 2.1vw, 0.95rem);
+      line-height: 1.25;
+      color: var(--ink);
+      word-break: break-word;
+    }
+
+    .task-cell .task-desc-preview {
+      font-style: italic;
+      font-size: clamp(0.65rem, 1.7vw, 0.75rem);
+      line-height: 1.25;
+      color: var(--ink-soft);
+      opacity: 0.85;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-width: 100%;
+    }
+
+    .task-cell.completed {
+      background: linear-gradient(160deg, rgba(180, 150, 120, 0.35) 0%, rgba(140, 110, 80, 0.3) 100%);
+      border-color: var(--parchment-deep);
+    }
+
+    .task-cell.completed .task-name,
+    .task-cell.completed .task-desc-preview {
+      color: var(--ink-soft);
+      opacity: 0.5;
+      text-decoration: line-through;
+      text-decoration-color: var(--blood);
+      text-decoration-thickness: 2px;
+    }
+
+    .task-cell .stamp {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(1.6) rotate(-12deg);
+      transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.22, 1.4, 0.36, 1);
+    }
+
+    .task-cell.completed .stamp {
+      opacity: 1;
+      transform: scale(1) rotate(-8deg);
+    }
+
+    .task-cell .stamp svg {
+      width: 72%;
+      height: 72%;
+      filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.2));
+    }
+
+    .task-cell.just-completed .stamp {
+      animation: stamp-slam 0.4s cubic-bezier(0.22, 1.4, 0.36, 1) forwards;
+    }
+
+    @keyframes stamp-slam {
+      0% { opacity: 0; transform: scale(2.2) rotate(-20deg); }
+      60% { opacity: 1; transform: scale(0.9) rotate(-6deg); }
+      100% { opacity: 1; transform: scale(1) rotate(-8deg); }
+    }
+
+    .admin-access {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 50;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(184, 134, 11, 0.4);
+      background: rgba(40, 20, 10, 0.7);
+      color: var(--gold);
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.45;
+      transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .admin-access:hover {
+      opacity: 1;
+      transform: scale(1.08);
+      box-shadow: 0 0 12px rgba(184, 134, 11, 0.4);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(10, 5, 2, 0.75);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+      animation: fade-in 0.2s ease;
+    }
+
+    .modal-overlay.nested { z-index: 120; }
+
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      background: linear-gradient(165deg, #e8d5b5 0%, #d4b88c 100%);
+      border: 3px double var(--ink-soft);
+      border-radius: 4px;
+      padding: 1.75rem 1.5rem;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 0 4px var(--wood-mid), 0 25px 60px rgba(0, 0, 0, 0.55);
+      position: relative;
+      animation: modal-up 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes modal-up {
+      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal h2 {
+      font-family: "Cinzel", serif;
+      font-size: 1.25rem;
+      letter-spacing: 0.12em;
+      text-align: center;
+      color: var(--blood);
+      margin-bottom: 0.25rem;
+    }
+
+    .modal .sub {
+      text-align: center;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      margin-bottom: 1.25rem;
+    }
+
+    .modal label {
+      display: block;
+      font-family: "Special Elite", monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 0.4rem;
+    }
+
+    .modal input[type="password"],
+    .modal input[type="text"],
+    .modal textarea {
+      width: 100%;
+      font-family: "IM Fell English", serif;
+      font-size: 1rem;
+      padding: 0.65rem 0.75rem;
+      border: 2px solid var(--ink-soft);
+      border-radius: 2px;
+      background: rgba(255, 250, 240, 0.7);
+      color: var(--ink);
+      margin-bottom: 1rem;
+      outline: none;
+    }
+
+    .modal input:focus,
+    .modal textarea:focus {
+      border-color: var(--blood);
+      box-shadow: 0 0 0 2px rgba(107, 28, 28, 0.2);
+    }
+
+    .modal textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .modal .error {
+      color: var(--blood);
+      font-size: 0.85rem;
+      margin: -0.5rem 0 0.75rem;
+      min-height: 1.2em;
+      text-align: center;
+    }
+
+    .modal .hint-msg {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      min-height: 1.2em;
+      margin: -0.35rem 0 0.75rem;
+      font-style: italic;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .btn {
+      font-family: "Cinzel", serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.1rem;
+      border: 2px solid var(--ink);
+      border-radius: 2px;
+      cursor: pointer;
+      background: var(--ink);
+      color: var(--parchment);
+      transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn:hover {
+      background: var(--blood);
+      border-color: var(--blood);
+      color: #fff;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .btn.secondary:hover {
+      background: rgba(60, 40, 20, 0.1);
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    .btn.danger {
+      background: var(--blood);
+      border-color: var(--blood);
+      color: #fff;
+    }
+
+    .btn.danger:hover {
+      background: #4a1010;
+      border-color: #4a1010;
+    }
+
+    .admin-panel .task-count {
+      text-align: center;
+      font-family: "Special Elite", monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: var(--ink-soft);
+      margin-bottom: 1rem;
+    }
+
+    .admin-divider {
+      border: none;
+      border-top: 1px dashed var(--parchment-deep);
+      margin: 1.25rem 0;
+    }
+
+    .admin-list {
+      list-style: none;
+      max-height: 180px;
+      overflow-y: auto;
+      margin-bottom: 0.5rem;
+    }
+
+    .admin-list li {
+      font-size: 0.85rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid rgba(100, 70, 40, 0.2);
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .admin-list li .meta { flex: 1; min-width: 0; }
+
+    .admin-list li .meta strong {
+      display: block;
+      font-family: "Cinzel", serif;
+      font-size: 0.8rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .admin-list li .meta span {
+      display: block;
+      font-style: italic;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      opacity: 0.85;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .admin-list li .status {
+      font-family: "Special Elite", monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      color: var(--ink-soft);
+      padding-top: 0.15rem;
+    }
+
+    .admin-list li .status.done { color: var(--blood); }
+
+    .saved-list {
+      list-style: none;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+
+    .saved-item {
+      border: 1px solid rgba(61, 43, 31, 0.25);
+      border-radius: 3px;
+      background: rgba(255, 250, 240, 0.45);
+      padding: 0.75rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .saved-item .saved-name {
+      font-family: "Cinzel", serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .saved-item .saved-desc {
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      line-height: 1.35;
+      margin-bottom: 0.65rem;
+      max-height: 3.6em;
+      overflow: hidden;
+    }
+
+    .saved-item .saved-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .saved-item .saved-actions .btn {
+      padding: 0.45rem 0.75rem;
+      font-size: 0.68rem;
+    }
+
+    .saved-empty {
+      text-align: center;
+      font-style: italic;
+      color: var(--ink-soft);
+      padding: 1.5rem 0.5rem;
+      opacity: 0.75;
+      list-style: none;
+    }
+
+    /* Salem note */
+    .note-overlay {
+      background: radial-gradient(ellipse at 50% 40%, rgba(40, 20, 10, 0.55) 0%, rgba(8, 4, 2, 0.88) 100%);
+    }
+
+    .salem-note {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      min-height: 320px;
+      max-height: min(86vh, 560px);
+      padding: 2rem 1.75rem 1.5rem;
+      background: linear-gradient(168deg, #f0e2c8 0%, #e4d0a8 38%, #d4b888 72%, #c9a978 100%);
+      border-radius: 2px 3px 4px 2px;
+      box-shadow:
+        0 2px 0 rgba(255, 255, 255, 0.25) inset,
+        0 -3px 8px rgba(80, 50, 20, 0.12) inset,
+        4px 14px 40px rgba(0, 0, 0, 0.55);
+      transform: rotate(-1.2deg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: note-rise 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes note-rise {
+      from { opacity: 0; transform: rotate(-4deg) translateY(24px) scale(0.94); }
+      to { opacity: 1; transform: rotate(-1.2deg) translateY(0) scale(1); }
+    }
+
+    .salem-note::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.4;
+      background:
+        radial-gradient(ellipse at 12% 18%, rgba(120, 70, 30, 0.22) 0%, transparent 42%),
+        radial-gradient(ellipse at 88% 78%, rgba(90, 50, 20, 0.18) 0%, transparent 40%);
+      mix-blend-mode: multiply;
+    }
+
+    .salem-note::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(90, 50, 25, 0.22);
+      pointer-events: none;
+    }
+
+    .note-pin {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #c4a060, #6b4420 70%);
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.35);
+      z-index: 2;
+    }
+
+    .note-header {
+      text-align: center;
+      margin: 0.75rem 0 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .note-label {
+      font-family: "Special Elite", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--stamp);
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+    }
+
+    .note-title {
+      font-family: "Cinzel", serif;
+      font-weight: 700;
+      font-size: clamp(1.15rem, 4vw, 1.45rem);
+      letter-spacing: 0.06em;
+      color: var(--ink);
+      line-height: 1.25;
+    }
+
+    .note-rule {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .note-rule span {
+      height: 1px;
+      width: 48px;
+      background: linear-gradient(90deg, transparent, var(--ink-soft), transparent);
+    }
+
+    .note-body {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.25rem 0.35rem 0.75rem;
+      font-style: italic;
+      font-size: 1.05rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      text-align: center;
+    }
+
+    .note-body.empty { opacity: 0.5; }
+
+    .note-status {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      font-family: "Special Elite", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--blood);
+      margin-bottom: 0.75rem;
+      min-height: 1em;
+    }
+
+    .note-actions {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: auto;
+      padding-top: 0.5rem;
+    }
+
+    .note-actions .btn { min-width: 120px; }
+
+    .note-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .note-check::before {
+      content: "✓";
+      font-weight: 700;
+    }
+
+    .file-bar {
+      margin-top: 1.25rem;
+      padding: 0.85rem 1rem;
+      background: rgba(40, 20, 10, 0.55);
+      border: 1px solid rgba(184, 134, 11, 0.35);
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .file-bar p {
+      font-family: "Special Elite", monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(212, 168, 75, 0.7);
+      margin-bottom: 0.65rem;
+      line-height: 1.4;
+    }
+
+    .file-bar .modal-actions {
+      margin-top: 0;
+    }
+
+    .file-bar .btn {
+      font-size: 0.68rem;
+      padding: 0.5rem 0.85rem;
+      border-color: var(--gold);
+      background: transparent;
+      color: var(--gold-light);
+    }
+
+    .file-bar .btn:hover {
+      background: var(--blood);
+      border-color: var(--blood);
+      color: #fff;
+    }
+
+    .file-bar .file-msg {
+      margin-top: 0.55rem;
+      min-height: 1.1em;
+      font-family: "IM Fell English", serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: rgba(232, 213, 181, 0.75);
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 1rem;
+      font-family: "Special Elite", monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: rgba(212, 168, 75, 0.45);
+      text-transform: uppercase;
+    }
+
+    input[type="file"].hidden-file {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    @media (max-width: 480px) {
+      .bingo-grid { grid-template-columns: repeat(2, 1fr); }
+      .bingo-card { padding: 1.25rem 1rem 1.5rem; }
+      .salem-note { transform: rotate(-0.6deg); max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top-bar">
+      <div class="sync-status" id="syncStatus" aria-live="polite">Local board</div>
+      <div class="progress-wrap" id="progressWrap" aria-hidden="true">
+        <div class="progress-label" id="progressLabel">0 / 0 sealed</div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <article class="bingo-card" aria-label="Bingo task card">
+      <div class="card-corner tl"></div>
+      <div class="card-corner tr"></div>
+      <div class="card-corner bl"></div>
+      <div class="card-corner br"></div>
+
+      <header class="card-header">
+        <div class="card-date" id="cardDate">—</div>
+        <h1 class="card-title">Tonight's Tasks</h1>
+        <div class="title-rule">
+          <span></span>
+          <i>✦</i>
+          <span></span>
+        </div>
+      </header>
+
+      <div class="bingo-grid" id="bingoGrid" role="list"></div>
+    </article>
+
+    <div class="file-bar" id="fileBar">
+      <p>Team sync · save board into a shared file (OneDrive / Teams) so everyone sees the same tasks</p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="saveHtmlBtn" title="Download a complete HTML page with all tasks baked in">Save Board as HTML</button>
+        <button type="button" class="btn" id="linkFileBtn" title="Link a shared JSON board file for live updates (Chrome/Edge)">Link Shared File</button>
+        <button type="button" class="btn" id="exportBtn">Export JSON</button>
+        <button type="button" class="btn" id="importBtn">Import JSON</button>
+      </div>
+      <div class="file-msg" id="fileMsg" aria-live="polite"></div>
+      <input type="file" id="importFileInput" class="hidden-file" accept=".json,application/json,.html,text/html" />
+    </div>
+
+    <!-- Board data lives here so the page can be shared as one self-contained file -->
+    <script type="application/json" id="bingo-embedded-data">null</script>
+
+    <p class="footer-note">Mark each square · Claim the night</p>
+  </div>
+
+  <button type="button" class="admin-access" id="adminAccessBtn" title="Admin" aria-label="Open admin access">🗝️</button>
+
+  <!-- Salem note -->
+  <div class="modal-overlay note-overlay" id="noteModal" role="dialog" aria-modal="true" aria-labelledby="noteTitle">
+    <div class="salem-note">
+      <div class="note-pin" aria-hidden="true"></div>
+      <div class="note-header">
+        <div class="note-label">Task Scroll</div>
+        <h2 class="note-title" id="noteTitle">—</h2>
+        <div class="note-rule"><span></span><i style="font-style:normal;font-size:0.7rem;opacity:0.6">✦</i><span></span></div>
+      </div>
+      <div class="note-body" id="noteBody"></div>
+      <div class="note-status" id="noteStatus"></div>
+      <div class="note-actions">
+        <button type="button" class="btn note-check" id="noteCompleteBtn">Complete</button>
+        <button type="button" class="btn secondary" id="noteCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password -->
+  <div class="modal-overlay" id="passwordModal" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+    <div class="modal">
+      <h2 id="pwTitle">Admin Seal</h2>
+      <p class="sub">Speak the password to enter the chamber.</p>
+      <label for="passwordInput">Password</label>
+      <input type="password" id="passwordInput" autocomplete="current-password" placeholder="••••••••" />
+      <div class="error" id="passwordError"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="pwCancelBtn">Leave</button>
+        <button type="button" class="btn" id="pwSubmitBtn">Enter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin -->
+  <div class="modal-overlay" id="adminModal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div class="modal admin-panel">
+      <h2 id="adminTitle">Admin Chamber</h2>
+      <p class="sub">Inscribe tasks upon the board.</p>
+      <p class="task-count" id="adminTaskCount">0 tasks on the board</p>
+
+      <label for="taskNameInput">Task name</label>
+      <input type="text" id="taskNameInput" placeholder="e.g. Sweep the hearth" maxlength="60" />
+
+      <label for="taskDescInput">Task description</label>
+      <textarea id="taskDescInput" placeholder="e.g. Clear ashes and lay fresh wood before midnight…" maxlength="280"></textarea>
+
+      <div class="hint-msg" id="saveHint" aria-live="polite"></div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn" id="addTaskBtn">Add Task</button>
+        <button type="button" class="btn secondary" id="saveTaskBtn">Save Task</button>
+        <button type="button" class="btn secondary" id="quickAddBtn">Quick Add</button>
+      </div>
+
+      <hr class="admin-divider" />
+
+      <label>Current board</label>
+      <ul class="admin-list" id="adminTaskList"></ul>
+
+      <hr class="admin-divider" />
+
+      <label>Team storage</label>
+      <p class="sub" style="margin-bottom:0.75rem;font-size:0.8rem">
+        Use “Save Board as HTML” or “Link Shared File” under the board so the whole team stays in sync.
+      </p>
+      <div class="modal-actions" style="margin-top:0;margin-bottom:0.75rem">
+        <button type="button" class="btn secondary" id="adminExportBtn">Export JSON</button>
+        <button type="button" class="btn secondary" id="adminImportBtn">Import JSON</button>
+      </div>
+
+      <hr class="admin-divider" />
+
+      <div class="modal-actions">
+        <button type="button" class="btn danger" id="resetBtn">Reset Board</button>
+        <button type="button" class="btn secondary" id="adminCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Add library -->
+  <div class="modal-overlay nested" id="quickAddModal" role="dialog" aria-modal="true" aria-labelledby="quickAddTitle">
+    <div class="modal">
+      <h2 id="quickAddTitle">Quick Add</h2>
+      <p class="sub">Saved task scrolls — add to the board or remove them.</p>
+      <div class="hint-msg" id="quickAddHint" aria-live="polite"></div>
+      <ul class="saved-list" id="savedList"></ul>
+      <div class="modal-actions">
+        <button type="button" class="btn secondary" id="quickAddCloseBtn">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /** Admin password — change here if needed */
+      const ADMIN_PASSWORD = "salem1692";
+
+      /** localStorage keys for this browser */
+      const BOARD_KEY = "bingo-card-board-v1";
+      const SAVED_KEY = "bingo-card-saved-v1";
+
+      /** @typedef {{ id: string, name: string, description: string, completed: boolean, createdAt: number }} Task */
+      /** @typedef {{ id: string, name: string, description: string, createdAt: number }} SavedTask */
+
+      const els = {
+        cardDate: document.getElementById("cardDate"),
+        bingoGrid: document.getElementById("bingoGrid"),
+        progressWrap: document.getElementById("progressWrap"),
+        progressLabel: document.getElementById("progressLabel"),
+        progressBar: document.getElementById("progressBar"),
+        progressFill: document.getElementById("progressFill"),
+        adminAccessBtn: document.getElementById("adminAccessBtn"),
+        noteModal: document.getElementById("noteModal"),
+        noteTitle: document.getElementById("noteTitle"),
+        noteBody: document.getElementById("noteBody"),
+        noteStatus: document.getElementById("noteStatus"),
+        noteCompleteBtn: document.getElementById("noteCompleteBtn"),
+        noteCloseBtn: document.getElementById("noteCloseBtn"),
+        passwordModal: document.getElementById("passwordModal"),
+        passwordInput: document.getElementById("passwordInput"),
+        passwordError: document.getElementById("passwordError"),
+        pwCancelBtn: document.getElementById("pwCancelBtn"),
+        pwSubmitBtn: document.getElementById("pwSubmitBtn"),
+        adminModal: document.getElementById("adminModal"),
+        taskNameInput: document.getElementById("taskNameInput"),
+        taskDescInput: document.getElementById("taskDescInput"),
+        addTaskBtn: document.getElementById("addTaskBtn"),
+        saveTaskBtn: document.getElementById("saveTaskBtn"),
+        quickAddBtn: document.getElementById("quickAddBtn"),
+        saveHint: document.getElementById("saveHint"),
+        resetBtn: document.getElementById("resetBtn"),
+        adminCloseBtn: document.getElementById("adminCloseBtn"),
+        adminTaskCount: document.getElementById("adminTaskCount"),
+        adminTaskList: document.getElementById("adminTaskList"),
+        quickAddModal: document.getElementById("quickAddModal"),
+        savedList: document.getElementById("savedList"),
+        quickAddCloseBtn: document.getElementById("quickAddCloseBtn"),
+        quickAddHint: document.getElementById("quickAddHint"),
+        exportBtn: document.getElementById("exportBtn"),
+        importBtn: document.getElementById("importBtn"),
+        saveHtmlBtn: document.getElementById("saveHtmlBtn"),
+        linkFileBtn: document.getElementById("linkFileBtn"),
+        adminExportBtn: document.getElementById("adminExportBtn"),
+        adminImportBtn: document.getElementById("adminImportBtn"),
+        importFileInput: document.getElementById("importFileInput"),
+        fileMsg: document.getElementById("fileMsg"),
+        syncStatus: document.getElementById("syncStatus"),
+        embeddedData: document.getElementById("bingo-embedded-data"),
+      };
+
+      /** @type {Task[]} */
+      let tasks = [];
+      /** @type {SavedTask[]} */
+      let savedTasks = [];
+      /** @type {string | null} */
+      let noteTaskId = null;
+      const FILE_VERSION = 1;
+      let boardUpdatedAt = 0;
+      /** @type {FileSystemFileHandle | null} */
+      let linkedFileHandle = null;
+      let linkedLastModified = 0;
+      let linkedPollTimer = null;
+      let suppressLinkedWrite = false;
+
+      els.cardDate.textContent = new Date().toLocaleDateString(undefined, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      function uid(prefix) {
+        return (prefix || "t") + "_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+      }
+
+      function setSync(state, text) {
+        if (!els.syncStatus) return;
+        els.syncStatus.className = "sync-status " + state;
+        els.syncStatus.textContent = text;
+      }
+
+      function clock() {
+        return new Date().toLocaleTimeString(undefined, {
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+      }
+
+      function normalizeTaskList(arr) {
+        if (!Array.isArray(arr)) return [];
+        return arr
+          .filter((t) => t && (typeof t.id === "string" || t.id != null) && (t.name || t.text))
+          .map((t) => ({
+            id: String(t.id || uid("t")),
+            name: String(t.name || t.text || "").trim().slice(0, 60),
+            description: typeof t.description === "string" ? t.description.slice(0, 280) : "",
+            completed: !!t.completed,
+            createdAt: typeof t.createdAt === "number" ? t.createdAt : Date.now(),
+          }))
+          .filter((t) => t.name);
+      }
+
+      function normalizeSavedList(arr) {
+        if (!Array.isArray(arr)) return [];
+        return arr
+          .filter((t) => t && t.name)
+          .map((t) => ({
+            id: String(t.id || uid("s")),
+            name: String(t.name).trim().slice(0, 60),
+            description: typeof t.description === "string" ? t.description.slice(0, 280) : "",
+            createdAt: typeof t.createdAt === "number" ? t.createdAt : Date.now(),
+          }));
+      }
+
+      function snapshot() {
+        return {
+          app: "tonights-tasks-bingo",
+          version: FILE_VERSION,
+          updatedAt: boardUpdatedAt || Date.now(),
+          exportedAt: new Date().toISOString(),
+          tasks: tasks,
+          savedTasks: savedTasks,
+        };
+      }
+
+      function readEmbeddedData() {
+        try {
+          const el = els.embeddedData;
+          if (!el) return null;
+          const raw = (el.textContent || "").trim();
+          if (!raw || raw === "null") return null;
+          return JSON.parse(raw);
+        } catch {
+          return null;
+        }
+      }
+
+      function writeEmbeddedData() {
+        if (!els.embeddedData) return;
+        els.embeddedData.textContent = JSON.stringify(snapshot());
+      }
+
+      // —— Storage ——
+      function loadBoardFromLocal() {
+        try {
+          const raw = localStorage.getItem(BOARD_KEY);
+          if (!raw) return [];
+          return normalizeTaskList(JSON.parse(raw));
+        } catch {
+          return [];
+        }
+      }
+
+      function loadSavedFromLocal() {
+        try {
+          const raw = localStorage.getItem(SAVED_KEY);
+          if (!raw) return [];
+          return normalizeSavedList(JSON.parse(raw));
+        } catch {
+          return [];
+        }
+      }
+
+      function persistAll() {
+        boardUpdatedAt = Date.now();
+        localStorage.setItem(BOARD_KEY, JSON.stringify(tasks));
+        localStorage.setItem(SAVED_KEY, JSON.stringify(savedTasks));
+        writeEmbeddedData();
+        if (linkedFileHandle && !suppressLinkedWrite) {
+          queueLinkedSave();
+        }
+      }
+
+      function saveBoard() {
+        persistAll();
+      }
+
+      function saveSaved() {
+        persistAll();
+      }
+
+      function applySnapshot(data, sourceLabel) {
+        if (!data || typeof data !== "object") return false;
+        const nextTasks = normalizeTaskList(data.tasks);
+        const nextSaved = normalizeSavedList(data.savedTasks);
+        // Accept pure task arrays too
+        if (Array.isArray(data) && !data.tasks) {
+          tasks = normalizeTaskList(data);
+        } else {
+          tasks = nextTasks;
+          if (nextSaved.length || Array.isArray(data.savedTasks)) {
+            savedTasks = nextSaved;
+          }
+        }
+        boardUpdatedAt =
+          typeof data.updatedAt === "number" ? data.updatedAt : Date.now();
+        suppressLinkedWrite = true;
+        localStorage.setItem(BOARD_KEY, JSON.stringify(tasks));
+        localStorage.setItem(SAVED_KEY, JSON.stringify(savedTasks));
+        writeEmbeddedData();
+        suppressLinkedWrite = false;
+        renderBoard();
+        setSync("ok", (sourceLabel || "Board loaded") + " · " + clock());
+        return true;
+      }
+
+      function bootLoad() {
+        // 1) Embedded data in this HTML file (shared self-contained page)
+        const embedded = readEmbeddedData();
+        if (embedded && (Array.isArray(embedded.tasks) || Array.isArray(embedded))) {
+          applySnapshot(embedded, "Loaded from page file");
+          setFileMsg("Board data was embedded in this HTML file.");
+          return;
+        }
+        // 2) Browser localStorage
+        tasks = loadBoardFromLocal();
+        savedTasks = loadSavedFromLocal();
+        boardUpdatedAt = Date.now();
+        writeEmbeddedData();
+        setSync("ok", "Local board · " + clock());
+      }
+
+      // —— Export / Import file (team hand-off) ——
+      function setFileMsg(text) {
+        if (els.fileMsg) els.fileMsg.textContent = text || "";
+        if (els.saveHint && text) els.saveHint.textContent = text;
+      }
+
+      function exportBoardFile() {
+        writeEmbeddedData();
+        const payload = snapshot();
+        const json = JSON.stringify(payload, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const stamp = new Date().toISOString().slice(0, 16).replace("T", "_").replace(":", "");
+        a.href = url;
+        a.download = "tonights-tasks-board_" + stamp + ".json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        setFileMsg(
+          "Exported " +
+            payload.tasks.length +
+            " task(s) as JSON. Send the file — teammates Import JSON to sync."
+        );
+      }
+
+      /** Download a full HTML page with all tasks baked into the file */
+      function saveBoardAsHtml() {
+        writeEmbeddedData();
+        const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+        const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        const stamp = new Date().toISOString().slice(0, 16).replace("T", "_").replace(":", "");
+        a.href = url;
+        a.download = "Tonights-Tasks-Board_" + stamp + ".html";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        setFileMsg(
+          "Saved full board page with " +
+            tasks.length +
+            " task(s) inside. Put this HTML on OneDrive/Teams and share the link — open it to load the same board."
+        );
+        setSync("ok", "HTML board saved · " + clock());
+      }
+
+      let linkedSaveTimer = null;
+      function queueLinkedSave() {
+        if (!linkedFileHandle) return;
+        clearTimeout(linkedSaveTimer);
+        linkedSaveTimer = setTimeout(() => {
+          saveToLinkedFile().catch((err) => {
+            console.error(err);
+            setSync("err", "Shared file save failed");
+            setFileMsg("Could not write shared file: " + (err.message || err));
+          });
+        }, 400);
+      }
+
+      async function saveToLinkedFile() {
+        if (!linkedFileHandle) return;
+        writeEmbeddedData();
+        const payload = snapshot();
+        const json = JSON.stringify(payload, null, 2);
+        const writable = await linkedFileHandle.createWritable();
+        await writable.write(json);
+        await writable.close();
+        const file = await linkedFileHandle.getFile();
+        linkedLastModified = file.lastModified;
+        setSync("ok", "Live shared file · " + clock());
+      }
+
+      async function loadFromLinkedFile() {
+        if (!linkedFileHandle) return false;
+        const file = await linkedFileHandle.getFile();
+        if (file.lastModified === linkedLastModified && tasks.length) return false;
+        const text = await file.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          // Maybe HTML with embedded JSON
+          const m = text.match(
+            /id=["']bingo-embedded-data["'][^>]*>([\s\S]*?)<\/script>/i
+          );
+          if (m && m[1] && m[1].trim() && m[1].trim() !== "null") {
+            data = JSON.parse(m[1].trim());
+          } else {
+            throw new Error("Shared file is not valid board JSON/HTML.");
+          }
+        }
+        linkedLastModified = file.lastModified;
+        const prevSig = tasks.map((t) => t.id + ":" + (t.completed ? "1" : "0")).join("|");
+        applySnapshot(data, "Synced from shared file");
+        const nextSig = tasks.map((t) => t.id + ":" + (t.completed ? "1" : "0")).join("|");
+        if (prevSig !== nextSig) {
+          setFileMsg("Board updated from shared file · " + clock());
+        }
+        return prevSig !== nextSig;
+      }
+
+      function startLinkedPolling() {
+        if (linkedPollTimer) clearInterval(linkedPollTimer);
+        linkedPollTimer = setInterval(() => {
+          if (document.hidden || !linkedFileHandle) return;
+          loadFromLinkedFile().catch(() => {});
+        }, 2000);
+        window.addEventListener("focus", () => {
+          if (linkedFileHandle) loadFromLinkedFile().catch(() => {});
+        });
+      }
+
+      async function linkSharedFile() {
+        // Prefer File System Access API (Chrome / Edge) — best for OneDrive live sync
+        if (window.showSaveFilePicker && window.showOpenFilePicker) {
+          const choice = window.confirm(
+            "Link a shared board file for live team updates.\n\n" +
+              "OK = Open an existing board JSON on OneDrive/network\n" +
+              "Cancel = Create a new board JSON file to share\n\n" +
+              "Tip: put the file in a Teams/OneDrive folder everyone can edit."
+          );
+          try {
+            if (choice) {
+              const handles = await window.showOpenFilePicker({
+                types: [
+                  {
+                    description: "Board JSON",
+                    accept: { "application/json": [".json"] },
+                  },
+                ],
+                multiple: false,
+              });
+              linkedFileHandle = handles[0];
+              await loadFromLinkedFile();
+            } else {
+              linkedFileHandle = await window.showSaveFilePicker({
+                suggestedName: "tonights-tasks-shared-board.json",
+                types: [
+                  {
+                    description: "Board JSON",
+                    accept: { "application/json": [".json"] },
+                  },
+                ],
+              });
+              await saveToLinkedFile();
+            }
+            startLinkedPolling();
+            setFileMsg(
+              "Linked shared file. Changes auto-save here; every 2s we check for teammate updates. Keep this tab open."
+            );
+            setSync("ok", "Live shared file · " + clock());
+            if (els.linkFileBtn) els.linkFileBtn.textContent = "Shared File Linked ✓";
+          } catch (err) {
+            if (err && err.name === "AbortError") {
+              setFileMsg("Link cancelled.");
+              return;
+            }
+            console.error(err);
+            setFileMsg("Could not link file: " + (err.message || err));
+          }
+          return;
+        }
+
+        // Fallback: classic file pick (import once — not live write)
+        setFileMsg(
+          "Live file linking needs Chrome or Edge. Use Save Board as HTML or Export/Import JSON instead."
+        );
+        alert(
+          "Live shared-file sync needs Chrome or Edge.\n\n" +
+            "Use:\n• Save Board as HTML (share that file on OneDrive)\n• or Export / Import JSON"
+        );
+      }
+
+      function normalizeImportedTask(t) {
+        if (!t || typeof t !== "object") return null;
+        const name =
+          typeof t.name === "string" && t.name.trim()
+            ? t.name.trim()
+            : typeof t.text === "string"
+              ? t.text.trim()
+              : "";
+        if (!name) return null;
+        return {
+          id: typeof t.id === "string" && t.id ? t.id : uid("t"),
+          name: name.slice(0, 60),
+          description: typeof t.description === "string" ? t.description.slice(0, 280) : "",
+          completed: !!t.completed,
+          createdAt: typeof t.createdAt === "number" ? t.createdAt : Date.now(),
+        };
+      }
+
+      function normalizeImportedSaved(t) {
+        if (!t || typeof t !== "object") return null;
+        const name = typeof t.name === "string" ? t.name.trim() : "";
+        if (!name) return null;
+        return {
+          id: typeof t.id === "string" && t.id ? t.id : uid("s"),
+          name: name.slice(0, 60),
+          description: typeof t.description === "string" ? t.description.slice(0, 280) : "",
+          createdAt: typeof t.createdAt === "number" ? t.createdAt : Date.now(),
+        };
+      }
+
+      /**
+       * Merge strategy for collaboration:
+       * - Union of tasks by id
+       * - If either side completed a task, keep completed = true
+       * - Prefer longer description / newer name when both exist
+       * - Saved library: union by id, then by name+description
+       */
+      function mergeBoards(incomingTasks, incomingSaved) {
+        const map = new Map();
+        tasks.forEach((t) => map.set(t.id, { ...t }));
+        incomingTasks.forEach((inc) => {
+          const cur = map.get(inc.id);
+          if (!cur) {
+            map.set(inc.id, { ...inc });
+            return;
+          }
+          map.set(inc.id, {
+            id: cur.id,
+            name: (inc.name && inc.name.length >= cur.name.length ? inc.name : cur.name).slice(0, 60),
+            description: (
+              (inc.description || "").length >= (cur.description || "").length
+                ? inc.description
+                : cur.description
+            ).slice(0, 280),
+            completed: !!(cur.completed || inc.completed),
+            createdAt: Math.min(cur.createdAt || Date.now(), inc.createdAt || Date.now()),
+          });
+        });
+
+        const savedMap = new Map();
+        function savedKey(t) {
+          return t.id || (t.name.toLowerCase() + "||" + (t.description || ""));
+        }
+        savedTasks.forEach((t) => savedMap.set(savedKey(t), { ...t }));
+        incomingSaved.forEach((inc) => {
+          const k = savedKey(inc);
+          if (!savedMap.has(k)) savedMap.set(k, { ...inc });
+        });
+
+        return {
+          tasks: Array.from(map.values()).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)),
+          savedTasks: Array.from(savedMap.values()),
+        };
+      }
+
+      function applyImport(payload, mode) {
+        let incomingTasks = [];
+        let incomingSaved = [];
+
+        if (Array.isArray(payload)) {
+          // raw array of tasks
+          incomingTasks = payload.map(normalizeImportedTask).filter(Boolean);
+        } else if (payload && typeof payload === "object") {
+          const list = Array.isArray(payload.tasks) ? payload.tasks : [];
+          incomingTasks = list.map(normalizeImportedTask).filter(Boolean);
+          const saved = Array.isArray(payload.savedTasks) ? payload.savedTasks : [];
+          incomingSaved = saved.map(normalizeImportedSaved).filter(Boolean);
+        } else {
+          throw new Error("Unrecognized file format.");
+        }
+
+        if (mode === "replace") {
+          tasks = incomingTasks;
+          if (incomingSaved.length) savedTasks = incomingSaved;
+        } else {
+          const merged = mergeBoards(incomingTasks, incomingSaved);
+          tasks = merged.tasks;
+          savedTasks = merged.savedTasks;
+        }
+
+        boardUpdatedAt = Date.now();
+        persistAll();
+        renderBoard();
+        return { taskCount: tasks.length, imported: incomingTasks.length };
+      }
+
+      function openImportPicker() {
+        els.importFileInput.value = "";
+        els.importFileInput.click();
+      }
+
+      function handleImportFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function () {
+          try {
+            const text = String(reader.result || "");
+            const payload = JSON.parse(text);
+
+            const choice = window.prompt(
+              "Import mode:\n\n" +
+                "Type MERGE to combine this file with your current board\n" +
+                "  (recommended for team hand-offs — keeps completions from both sides)\n\n" +
+                "Type REPLACE to wipe your board and use only this file\n\n" +
+                "Cancel to abort.",
+              "MERGE"
+            );
+            if (choice === null) {
+              setFileMsg("Import cancelled.");
+              return;
+            }
+            const mode = String(choice).trim().toLowerCase() === "replace" ? "replace" : "merge";
+            const result = applyImport(payload, mode);
+            setFileMsg(
+              (mode === "replace" ? "Replaced" : "Merged") +
+                " board — " +
+                result.imported +
+                " task(s) from file, " +
+                result.taskCount +
+                " total now. Export again after you make changes."
+            );
+          } catch (err) {
+            console.error(err);
+            setFileMsg("Could not import that file. Use a board .json export from this app.");
+            alert("Import failed.\n\n" + (err.message || err));
+          }
+        };
+        reader.onerror = function () {
+          setFileMsg("Could not read the file.");
+        };
+        reader.readAsText(file);
+      }
+
+      els.exportBtn.addEventListener("click", exportBoardFile);
+      els.importBtn.addEventListener("click", openImportPicker);
+      if (els.saveHtmlBtn) els.saveHtmlBtn.addEventListener("click", saveBoardAsHtml);
+      if (els.linkFileBtn) els.linkFileBtn.addEventListener("click", linkSharedFile);
+      if (els.adminExportBtn) els.adminExportBtn.addEventListener("click", exportBoardFile);
+      if (els.adminImportBtn) els.adminImportBtn.addEventListener("click", openImportPicker);
+      els.importFileInput.addEventListener("change", function () {
+        const file = els.importFileInput.files && els.importFileInput.files[0];
+        if (file) handleImportFile(file);
+      });
+
+      // —— Progress ——
+      function updateProgress() {
+        const total = tasks.length;
+        const done = tasks.filter((t) => t.completed).length;
+        const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+        if (total === 0) {
+          els.progressWrap.classList.remove("visible");
+          els.progressWrap.setAttribute("aria-hidden", "true");
+        } else {
+          els.progressWrap.classList.add("visible");
+          els.progressWrap.setAttribute("aria-hidden", "false");
+        }
+
+        els.progressLabel.textContent =
+          total === 0 ? "0 / 0 sealed" : done + " / " + total + " sealed · " + pct + "%";
+        els.progressFill.style.width = pct + "%";
+        els.progressBar.setAttribute("aria-valuenow", String(pct));
+      }
+
+      // —— Board ——
+      function renderBoard() {
+        els.bingoGrid.innerHTML = "";
+
+        if (tasks.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.innerHTML =
+            '<div class="sigil">☽</div>' +
+            "<p>The board is blank.<br/>No tasks have been inscribed… yet.</p>" +
+            '<p class="hint">Admin may open the seal to add tasks</p>';
+          els.bingoGrid.appendChild(empty);
+          updateProgress();
+          renderAdminList();
+          return;
+        }
+
+        tasks.forEach((task) => {
+          const cell = document.createElement("div");
+          cell.className = "task-cell" + (task.completed ? " completed" : "");
+          cell.setAttribute("role", "listitem");
+          cell.setAttribute("data-id", task.id);
+          cell.setAttribute("tabindex", "0");
+          cell.setAttribute(
+            "aria-label",
+            task.name + (task.completed ? " (completed)" : " (open note)")
+          );
+
+          const nameEl = document.createElement("span");
+          nameEl.className = "task-name";
+          nameEl.textContent = task.name;
+          cell.appendChild(nameEl);
+
+          if (task.description) {
+            const descEl = document.createElement("span");
+            descEl.className = "task-desc-preview";
+            descEl.textContent = task.description;
+            cell.appendChild(descEl);
+          }
+
+          const stamp = document.createElement("div");
+          stamp.className = "stamp";
+          stamp.setAttribute("aria-hidden", "true");
+          stamp.innerHTML =
+            '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+            '<circle cx="50" cy="50" r="42" fill="none" stroke="#6b1c1c" stroke-width="3" opacity="0.85"/>' +
+            '<path d="M28 32 L72 68 M72 32 L28 68" stroke="#6b1c1c" stroke-width="5" stroke-linecap="round" opacity="0.9"/>' +
+            "</svg>";
+          cell.appendChild(stamp);
+
+          cell.addEventListener("click", () => openNote(task.id));
+          cell.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openNote(task.id);
+            }
+          });
+
+          els.bingoGrid.appendChild(cell);
+        });
+
+        updateProgress();
+        renderAdminList();
+      }
+
+      function renderAdminList() {
+        els.adminTaskCount.textContent =
+          tasks.length === 0
+            ? "0 tasks on the board"
+            : tasks.length + " task" + (tasks.length === 1 ? "" : "s") + " on the board";
+
+        els.adminTaskList.innerHTML = "";
+        if (tasks.length === 0) {
+          const li = document.createElement("li");
+          li.style.opacity = "0.6";
+          li.style.fontStyle = "italic";
+          li.textContent = "None yet — add a task above.";
+          els.adminTaskList.appendChild(li);
+          return;
+        }
+
+        tasks.forEach((t) => {
+          const li = document.createElement("li");
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          const strong = document.createElement("strong");
+          strong.textContent = t.name;
+          meta.appendChild(strong);
+          const span = document.createElement("span");
+          span.textContent = t.description || "No description";
+          meta.appendChild(span);
+          const status = document.createElement("span");
+          status.className = "status" + (t.completed ? " done" : "");
+          status.textContent = t.completed ? "SEALED" : "open";
+          li.appendChild(meta);
+          li.appendChild(status);
+          els.adminTaskList.appendChild(li);
+        });
+      }
+
+      // —— Note modal ——
+      function fillNote(taskId) {
+        const task = tasks.find((t) => t.id === taskId);
+        if (!task) {
+          closeNote();
+          return;
+        }
+        els.noteTitle.textContent = task.name;
+        if (task.description) {
+          els.noteBody.textContent = task.description;
+          els.noteBody.classList.remove("empty");
+        } else {
+          els.noteBody.textContent = "No further details were written upon this scroll…";
+          els.noteBody.classList.add("empty");
+        }
+        if (task.completed) {
+          els.noteStatus.textContent = "Sealed · complete";
+          els.noteCompleteBtn.style.display = "none";
+        } else {
+          els.noteStatus.textContent = "";
+          els.noteCompleteBtn.style.display = "";
+        }
+      }
+
+      function openNote(taskId) {
+        if (!tasks.find((t) => t.id === taskId)) return;
+        noteTaskId = taskId;
+        fillNote(taskId);
+        els.noteModal.classList.add("open");
+      }
+
+      function closeNote() {
+        noteTaskId = null;
+        els.noteModal.classList.remove("open");
+      }
+
+      function completeFromNote() {
+        if (!noteTaskId) return;
+        const id = noteTaskId;
+        const task = tasks.find((t) => t.id === id);
+        if (!task || task.completed) return;
+
+        task.completed = true;
+        saveBoard();
+        fillNote(id);
+        els.noteStatus.textContent = "Sealed · complete";
+
+        setTimeout(() => {
+          closeNote();
+          renderBoard();
+          requestAnimationFrame(() => {
+            const cell = els.bingoGrid.querySelector('[data-id="' + id + '"]');
+            if (cell) {
+              cell.classList.add("just-completed");
+              setTimeout(() => cell.classList.remove("just-completed"), 450);
+            }
+          });
+        }, 400);
+      }
+
+      els.noteCompleteBtn.addEventListener("click", completeFromNote);
+      els.noteCloseBtn.addEventListener("click", closeNote);
+      els.noteModal.addEventListener("click", (e) => {
+        if (e.target === els.noteModal) closeNote();
+      });
+
+      // —— Admin password ——
+      function openPasswordModal() {
+        closeNote();
+        els.passwordError.textContent = "";
+        els.passwordInput.value = "";
+        els.passwordModal.classList.add("open");
+        setTimeout(() => els.passwordInput.focus(), 50);
+      }
+
+      function closePasswordModal() {
+        els.passwordModal.classList.remove("open");
+        els.passwordInput.value = "";
+        els.passwordError.textContent = "";
+      }
+
+      function tryPassword() {
+        if (els.passwordInput.value === ADMIN_PASSWORD) {
+          closePasswordModal();
+          openAdminModal();
+        } else {
+          els.passwordError.textContent = "The seal rejects that word.";
+          els.passwordInput.value = "";
+          els.passwordInput.focus();
+        }
+      }
+
+      els.adminAccessBtn.addEventListener("click", openPasswordModal);
+      els.pwCancelBtn.addEventListener("click", closePasswordModal);
+      els.pwSubmitBtn.addEventListener("click", tryPassword);
+      els.passwordInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") tryPassword();
+      });
+      els.passwordModal.addEventListener("click", (e) => {
+        if (e.target === els.passwordModal) closePasswordModal();
+      });
+
+      // —— Admin ——
+      function openAdminModal() {
+        renderAdminList();
+        els.saveHint.textContent = "";
+        els.adminModal.classList.add("open");
+        setTimeout(() => els.taskNameInput.focus(), 50);
+      }
+
+      function closeAdminModal() {
+        els.adminModal.classList.remove("open");
+        closeQuickAdd();
+      }
+
+      function getFormFields() {
+        return {
+          name: els.taskNameInput.value.trim(),
+          description: els.taskDescInput.value.trim(),
+        };
+      }
+
+      function addTask() {
+        const { name, description } = getFormFields();
+        if (!name) {
+          els.taskNameInput.focus();
+          return;
+        }
+        tasks.push({
+          id: uid("t"),
+          name: name.slice(0, 60),
+          description: description.slice(0, 280),
+          completed: false,
+          createdAt: Date.now(),
+        });
+        saveBoard();
+        renderBoard();
+        els.taskNameInput.value = "";
+        els.taskDescInput.value = "";
+        els.saveHint.textContent = "Task added to the board.";
+        els.taskNameInput.focus();
+      }
+
+      function saveTaskTemplate() {
+        const { name, description } = getFormFields();
+        if (!name) {
+          els.taskNameInput.focus();
+          els.saveHint.textContent = "Enter a task name to save.";
+          return;
+        }
+        const exists = savedTasks.some(
+          (t) =>
+            t.name.toLowerCase() === name.toLowerCase() &&
+            t.description === description
+        );
+        if (exists) {
+          els.saveHint.textContent = "That scroll is already in Quick Add.";
+          return;
+        }
+        savedTasks.unshift({
+          id: uid("s"),
+          name: name.slice(0, 60),
+          description: description.slice(0, 280),
+          createdAt: Date.now(),
+        });
+        saveSaved();
+        els.saveHint.textContent = "Saved to Quick Add library.";
+      }
+
+      function resetBoard() {
+        if (tasks.length === 0) return;
+        if (
+          !confirm(
+            "Reset the entire board?\n\nAll tasks and progress will be cleared. Saved Quick Add tasks are kept."
+          )
+        ) {
+          return;
+        }
+        tasks = [];
+        saveBoard();
+        renderBoard();
+      }
+
+      els.addTaskBtn.addEventListener("click", addTask);
+      els.saveTaskBtn.addEventListener("click", saveTaskTemplate);
+      els.quickAddBtn.addEventListener("click", openQuickAdd);
+      els.taskNameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          els.taskDescInput.focus();
+        }
+      });
+      els.taskDescInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          addTask();
+        }
+      });
+      els.resetBtn.addEventListener("click", resetBoard);
+      els.adminCloseBtn.addEventListener("click", closeAdminModal);
+      els.adminModal.addEventListener("click", (e) => {
+        if (e.target === els.adminModal) closeAdminModal();
+      });
+
+      // —— Quick Add ——
+      function openQuickAdd() {
+        els.quickAddHint.textContent = "";
+        renderSavedList();
+        els.quickAddModal.classList.add("open");
+      }
+
+      function closeQuickAdd() {
+        els.quickAddModal.classList.remove("open");
+      }
+
+      function renderSavedList() {
+        els.savedList.innerHTML = "";
+        if (savedTasks.length === 0) {
+          const empty = document.createElement("li");
+          empty.className = "saved-empty";
+          empty.textContent = "No saved tasks yet. Use Save Task in the admin chamber.";
+          els.savedList.appendChild(empty);
+          return;
+        }
+
+        savedTasks.forEach((item) => {
+          const li = document.createElement("li");
+          li.className = "saved-item";
+
+          const name = document.createElement("div");
+          name.className = "saved-name";
+          name.textContent = item.name;
+          li.appendChild(name);
+
+          const desc = document.createElement("div");
+          desc.className = "saved-desc";
+          desc.textContent = item.description || "No description";
+          li.appendChild(desc);
+
+          const actions = document.createElement("div");
+          actions.className = "saved-actions";
+
+          const addBtn = document.createElement("button");
+          addBtn.type = "button";
+          addBtn.className = "btn";
+          addBtn.textContent = "Quick Add";
+          addBtn.addEventListener("click", () => {
+            tasks.push({
+              id: uid("t"),
+              name: item.name,
+              description: item.description,
+              completed: false,
+              createdAt: Date.now(),
+            });
+            saveBoard();
+            renderBoard();
+            els.quickAddHint.textContent = "“" + item.name + "” added to the board.";
+          });
+
+          const delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.className = "btn danger";
+          delBtn.textContent = "Delete";
+          delBtn.addEventListener("click", () => {
+            if (!confirm('Delete saved task "' + item.name + '" from Quick Add?')) return;
+            savedTasks = savedTasks.filter((t) => t.id !== item.id);
+            saveSaved();
+            renderSavedList();
+            els.quickAddHint.textContent = "Removed from library.";
+          });
+
+          actions.appendChild(addBtn);
+          actions.appendChild(delBtn);
+          li.appendChild(actions);
+          els.savedList.appendChild(li);
+        });
+      }
+
+      els.quickAddCloseBtn.addEventListener("click", closeQuickAdd);
+      els.quickAddModal.addEventListener("click", (e) => {
+        if (e.target === els.quickAddModal) closeQuickAdd();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        if (els.quickAddModal.classList.contains("open")) {
+          closeQuickAdd();
+          return;
+        }
+        if (els.noteModal.classList.contains("open")) {
+          closeNote();
+          return;
+        }
+        if (els.passwordModal.classList.contains("open")) {
+          closePasswordModal();
+          return;
+        }
+        if (els.adminModal.classList.contains("open")) {
+          closeAdminModal();
+        }
+      });
+
+      // Start: load embedded page data or localStorage
+      bootLoad();
+      renderBoard();
+    })();
+  </script>
+</body>
+</html>
