@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784148281832,
+  "updatedAt": 1784148501084,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-15T20:44:41.833Z",
+  "exportedAt": "2026-07-15T20:48:21.084Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -44,6 +44,14 @@
       "completed": false,
       "createdAt": 1784148280520,
       "updatedAt": 1784148280520
+    },
+    {
+      "id": "t_mrmjy8zy_dk6g78",
+      "name": "Pull and Charge next days cars",
+      "description": "",
+      "completed": false,
+      "createdAt": 1784148499726,
+      "updatedAt": 1784148499726
     }
   ],
   "savedTasks": [
