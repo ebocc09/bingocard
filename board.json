@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784150796267,
+  "updatedAt": 1784150815504,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-15T21:26:36.267Z",
+  "exportedAt": "2026-07-15T21:26:55.506Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -73,12 +73,30 @@
       "id": "t_mrmlbg3q_3r2362",
       "name": "For nick",
       "description": "L",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784150795078,
-      "updatedAt": 1784150795078
+      "updatedAt": 1784150814205
     }
   ],
   "savedTasks": [
+    {
+      "id": "s_mrmjtizk_dq7s7k",
+      "name": "Clear Trade-in Parking",
+      "description": "Open up every space in the trade-in parking zone.",
+      "createdAt": 1784148279392
+    },
+    {
+      "id": "s_mrmj0vz6_gfqsa2",
+      "name": "Plate Audit",
+      "description": "Gather all the plates in a consolidated area and post a photo of all the plates in the teams chat prior to marking this task completed",
+      "createdAt": 1784146943202
+    },
+    {
+      "id": "s_mrmj43b5_hy9b1w",
+      "name": "Loaner Audit",
+      "description": "Using Mission Control via garage, filter for service loaners in Cypress and verify there are no loaners stored at offsite. If there are any loaners stored at offsite, quickly retrieve them before marking this task completed.",
+      "createdAt": 1784147092673
+    },
     {
       "id": "s_mrmjnzh3_rai5t9",
       "name": "Clear Overflow",
@@ -90,24 +108,6 @@
       "name": "Box Audit",
       "description": "Take all the keys from the offsite key drop off box and post a photo in the teams chat to confirm keys have been grabbed.",
       "createdAt": 1784147675745
-    },
-    {
-      "id": "s_mrmj43b5_hy9b1w",
-      "name": "Loaner Audit",
-      "description": "Using Mission Control via garage, filter for service loaners in Cypress and verify there are no loaners stored at offsite. If there are any loaners stored at offsite, quickly retrieve them before marking this task completed.",
-      "createdAt": 1784147092673
-    },
-    {
-      "id": "s_mrmj0vz6_gfqsa2",
-      "name": "Plate Audit",
-      "description": "Gather all the plates in a consolidated area and post a photo of all the plates in the teams chat prior to marking this task completed",
-      "createdAt": 1784146943202
-    },
-    {
-      "id": "s_mrmjtizk_dq7s7k",
-      "name": "Clear Trade-in Parking",
-      "description": "Open up every space in the trade-in parking zone.",
-      "createdAt": 1784148279392
     }
   ]
 }
