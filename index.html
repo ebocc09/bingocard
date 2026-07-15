@@ -927,15 +927,43 @@
     </article>
 
     <div class="file-bar" id="fileBar">
-      <p>Team sync · save board into a shared file (OneDrive / Teams) so everyone sees the same tasks</p>
+      <p>GitHub live sync · one board.json in the repo · everyone sees the same updates</p>
       <div class="modal-actions">
-        <button type="button" class="btn" id="saveHtmlBtn" title="Download a complete HTML page with all tasks baked in">Save Board as HTML</button>
-        <button type="button" class="btn" id="linkFileBtn" title="Link a shared JSON board file for live updates (Chrome/Edge)">Link Shared File</button>
+        <button type="button" class="btn" id="githubConnectBtn" title="Connect a GitHub token to save live">Connect GitHub</button>
+        <button type="button" class="btn" id="githubPullBtn" title="Pull latest board from GitHub">Pull Latest</button>
         <button type="button" class="btn" id="exportBtn">Export JSON</button>
         <button type="button" class="btn" id="importBtn">Import JSON</button>
+        <button type="button" class="btn" id="saveHtmlBtn">Save as HTML</button>
       </div>
       <div class="file-msg" id="fileMsg" aria-live="polite"></div>
       <input type="file" id="importFileInput" class="hidden-file" accept=".json,application/json,.html,text/html" />
+    </div>
+
+    <!-- GitHub connect modal -->
+    <div class="modal-overlay nested" id="githubModal" role="dialog" aria-modal="true">
+      <div class="modal">
+        <h2>GitHub Live Sync</h2>
+        <p class="sub">Store the board in board.json on your repo so everyone stays in sync.</p>
+        <label for="ghOwner">Owner (user or org)</label>
+        <input type="text" id="ghOwner" placeholder="your-github-username" />
+        <label for="ghRepo">Repository name</label>
+        <input type="text" id="ghRepo" placeholder="bingo-card" />
+        <label for="ghPath">Board file path</label>
+        <input type="text" id="ghPath" placeholder="board.json" />
+        <label for="ghBranch">Branch</label>
+        <input type="text" id="ghBranch" placeholder="main" />
+        <label for="ghToken">Personal Access Token (write access to this repo)</label>
+        <input type="password" id="ghToken" placeholder="ghp_… or github_pat_…" autocomplete="off" />
+        <p class="sub" style="font-size:0.8rem;margin-top:-0.5rem">
+          Token is stored only in <em>this browser</em>, never in the page or repo. See GITHUB-SYNC.md
+        </p>
+        <div class="error" id="ghError"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" id="ghCancelBtn">Cancel</button>
+          <button type="button" class="btn secondary" id="ghDisconnectBtn">Disconnect</button>
+          <button type="button" class="btn" id="ghSaveBtn">Save &amp; Connect</button>
+        </div>
+      </div>
     </div>
 
     <!-- Board data lives here so the page can be shared as one self-contained file -->
@@ -1045,9 +1073,23 @@
       /** Admin password — change here if needed */
       const ADMIN_PASSWORD = "salem1692";
 
+      /**
+       * GitHub live sync defaults (auto-filled from github.io when possible).
+       * Everyone loads/polls board.json. Saving requires a PAT (Connect GitHub).
+       */
+      const GITHUB_DEFAULTS = {
+        owner: "", // e.g. "myuser"
+        repo: "", // e.g. "bingo-card"
+        path: "board.json",
+        branch: "main",
+        pollMs: 3000,
+      };
+
       /** localStorage keys for this browser */
       const BOARD_KEY = "bingo-card-board-v1";
       const SAVED_KEY = "bingo-card-saved-v1";
+      const GH_CFG_KEY = "bingo-github-config-v1";
+      const GH_TOKEN_KEY = "bingo-github-token-v1";
 
       /** @typedef {{ id: string, name: string, description: string, completed: boolean, createdAt: number }} Task */
       /** @typedef {{ id: string, name: string, description: string, createdAt: number }} SavedTask */
@@ -1089,7 +1131,18 @@
         exportBtn: document.getElementById("exportBtn"),
         importBtn: document.getElementById("importBtn"),
         saveHtmlBtn: document.getElementById("saveHtmlBtn"),
-        linkFileBtn: document.getElementById("linkFileBtn"),
+        githubConnectBtn: document.getElementById("githubConnectBtn"),
+        githubPullBtn: document.getElementById("githubPullBtn"),
+        githubModal: document.getElementById("githubModal"),
+        ghOwner: document.getElementById("ghOwner"),
+        ghRepo: document.getElementById("ghRepo"),
+        ghPath: document.getElementById("ghPath"),
+        ghBranch: document.getElementById("ghBranch"),
+        ghToken: document.getElementById("ghToken"),
+        ghError: document.getElementById("ghError"),
+        ghCancelBtn: document.getElementById("ghCancelBtn"),
+        ghDisconnectBtn: document.getElementById("ghDisconnectBtn"),
+        ghSaveBtn: document.getElementById("ghSaveBtn"),
         adminExportBtn: document.getElementById("adminExportBtn"),
         adminImportBtn: document.getElementById("adminImportBtn"),
         importFileInput: document.getElementById("importFileInput"),
@@ -1106,11 +1159,12 @@
       let noteTaskId = null;
       const FILE_VERSION = 1;
       let boardUpdatedAt = 0;
-      /** @type {FileSystemFileHandle | null} */
-      let linkedFileHandle = null;
-      let linkedLastModified = 0;
-      let linkedPollTimer = null;
-      let suppressLinkedWrite = false;
+      let suppressRemoteWrite = false;
+      let ghPushTimer = null;
+      let ghPollTimer = null;
+      let ghFileSha = null;
+      let ghConnected = false;
+      let ghBusy = false;
 
       els.cardDate.textContent = new Date().toLocaleDateString(undefined, {
         weekday: "long",
@@ -1217,8 +1271,8 @@
         localStorage.setItem(BOARD_KEY, JSON.stringify(tasks));
         localStorage.setItem(SAVED_KEY, JSON.stringify(savedTasks));
         writeEmbeddedData();
-        if (linkedFileHandle && !suppressLinkedWrite) {
-          queueLinkedSave();
+        if (!suppressRemoteWrite && ghConnected && getGhToken()) {
+          queueGitHubPush();
         }
       }
 
@@ -1232,42 +1286,466 @@
 
       function applySnapshot(data, sourceLabel) {
         if (!data || typeof data !== "object") return false;
-        const nextTasks = normalizeTaskList(data.tasks);
-        const nextSaved = normalizeSavedList(data.savedTasks);
-        // Accept pure task arrays too
-        if (Array.isArray(data) && !data.tasks) {
-          tasks = normalizeTaskList(data);
-        } else {
-          tasks = nextTasks;
-          if (nextSaved.length || Array.isArray(data.savedTasks)) {
-            savedTasks = nextSaved;
-          }
+        const nextTasks = normalizeTaskList(
+          Array.isArray(data) ? data : data.tasks
+        );
+        const nextSaved = normalizeSavedList(
+          Array.isArray(data) ? [] : data.savedTasks
+        );
+        tasks = nextTasks;
+        if (!Array.isArray(data) && Array.isArray(data.savedTasks)) {
+          savedTasks = nextSaved;
+        } else if (nextSaved.length) {
+          savedTasks = nextSaved;
         }
         boardUpdatedAt =
           typeof data.updatedAt === "number" ? data.updatedAt : Date.now();
-        suppressLinkedWrite = true;
+        suppressRemoteWrite = true;
         localStorage.setItem(BOARD_KEY, JSON.stringify(tasks));
         localStorage.setItem(SAVED_KEY, JSON.stringify(savedTasks));
         writeEmbeddedData();
-        suppressLinkedWrite = false;
+        suppressRemoteWrite = false;
         renderBoard();
         setSync("ok", (sourceLabel || "Board loaded") + " · " + clock());
         return true;
       }
 
-      function bootLoad() {
-        // 1) Embedded data in this HTML file (shared self-contained page)
+      // —— GitHub config / API ——
+      function detectGitHubFromLocation() {
+        const host = location.hostname || "";
+        // user.github.io/repo/...
+        if (/\.github\.io$/i.test(host)) {
+          const owner = host.replace(/\.github\.io$/i, "");
+          const parts = location.pathname.split("/").filter(Boolean);
+          const repo = parts[0] || owner + ".github.io";
+          return { owner: owner, repo: repo };
+        }
+        // github.com/owner/repo
+        const m = location.href.match(/github\.com\/([^/]+)\/([^/#?]+)/i);
+        if (m) return { owner: m[1], repo: m[2].replace(/\.git$/, "") };
+        return { owner: "", repo: "" };
+      }
+
+      function loadGhConfig() {
+        const detected = detectGitHubFromLocation();
+        let stored = {};
+        try {
+          stored = JSON.parse(localStorage.getItem(GH_CFG_KEY) || "{}") || {};
+        } catch (_) {
+          stored = {};
+        }
+        return {
+          owner: stored.owner || GITHUB_DEFAULTS.owner || detected.owner || "",
+          repo: stored.repo || GITHUB_DEFAULTS.repo || detected.repo || "",
+          path: stored.path || GITHUB_DEFAULTS.path || "board.json",
+          branch: stored.branch || GITHUB_DEFAULTS.branch || "main",
+          pollMs: stored.pollMs || GITHUB_DEFAULTS.pollMs || 3000,
+        };
+      }
+
+      function saveGhConfig(cfg) {
+        localStorage.setItem(
+          GH_CFG_KEY,
+          JSON.stringify({
+            owner: cfg.owner,
+            repo: cfg.repo,
+            path: cfg.path,
+            branch: cfg.branch,
+            pollMs: cfg.pollMs || 3000,
+          })
+        );
+      }
+
+      function getGhToken() {
+        try {
+          return localStorage.getItem(GH_TOKEN_KEY) || "";
+        } catch (_) {
+          return "";
+        }
+      }
+
+      function setGhToken(token) {
+        if (token) localStorage.setItem(GH_TOKEN_KEY, token);
+        else localStorage.removeItem(GH_TOKEN_KEY);
+      }
+
+      function ghApiHeaders(withAuth) {
+        const h = {
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        };
+        const token = getGhToken();
+        if (withAuth && token) h.Authorization = "Bearer " + token;
+        return h;
+      }
+
+      function utf8ToBase64(str) {
+        return btoa(unescape(encodeURIComponent(str)));
+      }
+
+      function base64ToUtf8(b64) {
+        return decodeURIComponent(escape(atob(b64.replace(/\n/g, ""))));
+      }
+
+      async function ghFetchBoard() {
+        const cfg = loadGhConfig();
+        if (!cfg.owner || !cfg.repo) throw new Error("Set GitHub owner and repo first.");
+        const url =
+          "https://api.github.com/repos/" +
+          encodeURIComponent(cfg.owner) +
+          "/" +
+          encodeURIComponent(cfg.repo) +
+          "/contents/" +
+          cfg.path.split("/").map(encodeURIComponent).join("/") +
+          "?ref=" +
+          encodeURIComponent(cfg.branch) +
+          "&_=" +
+          Date.now();
+        const res = await fetch(url, {
+          headers: ghApiHeaders(!!getGhToken()),
+          cache: "no-store",
+        });
+        if (res.status === 404) {
+          return { missing: true, data: null, sha: null };
+        }
+        if (!res.ok) {
+          const t = await res.text().catch(() => "");
+          throw new Error("GitHub read failed (" + res.status + ") " + t.slice(0, 160));
+        }
+        const body = await res.json();
+        const json = base64ToUtf8(body.content || "");
+        const data = JSON.parse(json);
+        ghFileSha = body.sha || null;
+        return { missing: false, data: data, sha: body.sha };
+      }
+
+      async function ghPushBoard() {
+        const cfg = loadGhConfig();
+        const token = getGhToken();
+        if (!token) throw new Error("Connect GitHub with a token to save live.");
+        if (!cfg.owner || !cfg.repo) throw new Error("Set GitHub owner and repo.");
+
+        // Refresh sha to reduce conflicts
+        try {
+          const latest = await ghFetchBoard();
+          if (!latest.missing && latest.sha) ghFileSha = latest.sha;
+          if (latest.missing) ghFileSha = null;
+        } catch (_) {
+          /* continue with known sha */
+        }
+
+        const payload = snapshot();
+        const content = utf8ToBase64(JSON.stringify(payload, null, 2));
+        const url =
+          "https://api.github.com/repos/" +
+          encodeURIComponent(cfg.owner) +
+          "/" +
+          encodeURIComponent(cfg.repo) +
+          "/contents/" +
+          cfg.path.split("/").map(encodeURIComponent).join("/");
+
+        const body = {
+          message: "Update Tonight's Tasks board · " + new Date().toISOString(),
+          content: content,
+          branch: cfg.branch,
+        };
+        if (ghFileSha) body.sha = ghFileSha;
+
+        const res = await fetch(url, {
+          method: "PUT",
+          headers: Object.assign(
+            { "Content-Type": "application/json" },
+            ghApiHeaders(true)
+          ),
+          body: JSON.stringify(body),
+        });
+
+        if (res.status === 409 || res.status === 422) {
+          // conflict — pull, merge, retry once
+          const remote = await ghFetchBoard();
+          if (!remote.missing && remote.data) {
+            mergeRemoteIntoLocal(remote.data);
+            const payload2 = snapshot();
+            const body2 = {
+              message: "Merge Tonight's Tasks board · " + new Date().toISOString(),
+              content: utf8ToBase64(JSON.stringify(payload2, null, 2)),
+              branch: cfg.branch,
+              sha: remote.sha || ghFileSha,
+            };
+            const res2 = await fetch(url, {
+              method: "PUT",
+              headers: Object.assign(
+                { "Content-Type": "application/json" },
+                ghApiHeaders(true)
+              ),
+              body: JSON.stringify(body2),
+            });
+            if (!res2.ok) {
+              const t = await res2.text().catch(() => "");
+              throw new Error("GitHub save conflict (" + res2.status + ") " + t.slice(0, 160));
+            }
+            const out2 = await res2.json();
+            ghFileSha = out2.content && out2.content.sha ? out2.content.sha : ghFileSha;
+            return;
+          }
+        }
+
+        if (!res.ok) {
+          const t = await res.text().catch(() => "");
+          throw new Error("GitHub save failed (" + res.status + ") " + t.slice(0, 200));
+        }
+        const out = await res.json();
+        ghFileSha = out.content && out.content.sha ? out.content.sha : ghFileSha;
+      }
+
+      function mergeRemoteIntoLocal(remote) {
+        const remoteTasks = normalizeTaskList(remote.tasks || remote);
+        const map = new Map();
+        tasks.forEach((t) => map.set(t.id, Object.assign({}, t)));
+        remoteTasks.forEach((inc) => {
+          const cur = map.get(inc.id);
+          if (!cur) {
+            map.set(inc.id, inc);
+            return;
+          }
+          map.set(inc.id, {
+            id: cur.id,
+            name: (inc.name && inc.name.length >= cur.name.length ? inc.name : cur.name).slice(0, 60),
+            description: (
+              (inc.description || "").length >= (cur.description || "").length
+                ? inc.description || ""
+                : cur.description || ""
+            ).slice(0, 280),
+            completed: !!(cur.completed || inc.completed),
+            createdAt: Math.min(cur.createdAt || Date.now(), inc.createdAt || Date.now()),
+          });
+        });
+        tasks = Array.from(map.values()).sort(
+          (a, b) => (a.createdAt || 0) - (b.createdAt || 0)
+        );
+        if (Array.isArray(remote.savedTasks) && remote.savedTasks.length) {
+          const savedMap = new Map();
+          savedTasks.forEach((t) => savedMap.set(t.id, t));
+          normalizeSavedList(remote.savedTasks).forEach((t) => {
+            if (!savedMap.has(t.id)) savedMap.set(t.id, t);
+          });
+          savedTasks = Array.from(savedMap.values());
+        }
+        boardUpdatedAt = Date.now();
+        suppressRemoteWrite = true;
+        localStorage.setItem(BOARD_KEY, JSON.stringify(tasks));
+        localStorage.setItem(SAVED_KEY, JSON.stringify(savedTasks));
+        writeEmbeddedData();
+        suppressRemoteWrite = false;
+        renderBoard();
+      }
+
+      function queueGitHubPush() {
+        clearTimeout(ghPushTimer);
+        ghPushTimer = setTimeout(() => {
+          pushToGitHubNow().catch((err) => {
+            console.error(err);
+            setSync("err", "GitHub save failed");
+            setFileMsg(String(err.message || err));
+          });
+        }, 600);
+      }
+
+      async function pushToGitHubNow() {
+        if (ghBusy) return;
+        ghBusy = true;
+        setSync("busy", "Saving to GitHub…");
+        try {
+          await ghPushBoard();
+          setSync("ok", "Live · GitHub · " + clock());
+          setFileMsg("Saved to GitHub. Teammates will see updates within a few seconds.");
+        } finally {
+          ghBusy = false;
+        }
+      }
+
+      async function pullFromGitHub(silent) {
+        const cfg = loadGhConfig();
+        if (!cfg.owner || !cfg.repo) return;
+        try {
+          const result = await ghFetchBoard();
+          if (result.missing) {
+            if (!silent) {
+              setFileMsg(
+                "board.json not found yet. Connect with a token and make any change to create it."
+              );
+            }
+            if (getGhToken()) {
+              setSync("ok", "GitHub ready · no board yet · " + clock());
+            } else {
+              setSync("ok", "GitHub read · create board with Connect · " + clock());
+            }
+            return;
+          }
+          const remote = result.data;
+          const remoteSig = normalizeTaskList(remote.tasks || remote)
+            .map((t) => t.id + ":" + (t.completed ? "1" : "0"))
+            .join("|");
+          const localSig = tasks.map((t) => t.id + ":" + (t.completed ? "1" : "0")).join("|");
+          if (remoteSig !== localSig || (remote.updatedAt || 0) > boardUpdatedAt) {
+            // Prefer merge if we have local unpushed changes and a token
+            if (!silent && tasks.length && getGhToken() && remoteSig !== localSig) {
+              mergeRemoteIntoLocal(remote);
+            } else {
+              applySnapshot(remote, "Live · GitHub");
+            }
+            if (!silent) setFileMsg("Pulled latest board from GitHub.");
+          } else {
+            setSync("ok", "Live · GitHub · " + clock());
+          }
+        } catch (err) {
+          if (!silent) {
+            setSync("err", "GitHub pull failed");
+            setFileMsg(String(err.message || err));
+          }
+        }
+      }
+
+      function startGitHubPolling() {
+        const cfg = loadGhConfig();
+        if (ghPollTimer) clearInterval(ghPollTimer);
+        if (!cfg.owner || !cfg.repo) return;
+        ghPollTimer = setInterval(() => {
+          if (document.hidden || ghBusy) return;
+          pullFromGitHub(true);
+        }, cfg.pollMs || 3000);
+        window.addEventListener("focus", () => pullFromGitHub(true));
+      }
+
+      function openGitHubModal() {
+        const cfg = loadGhConfig();
+        els.ghOwner.value = cfg.owner;
+        els.ghRepo.value = cfg.repo;
+        els.ghPath.value = cfg.path;
+        els.ghBranch.value = cfg.branch;
+        els.ghToken.value = getGhToken();
+        els.ghError.textContent = "";
+        els.githubModal.classList.add("open");
+      }
+
+      function closeGitHubModal() {
+        els.githubModal.classList.remove("open");
+      }
+
+      async function saveGitHubConnection() {
+        const cfg = {
+          owner: (els.ghOwner.value || "").trim(),
+          repo: (els.ghRepo.value || "").trim(),
+          path: (els.ghPath.value || "board.json").trim() || "board.json",
+          branch: (els.ghBranch.value || "main").trim() || "main",
+          pollMs: 3000,
+        };
+        const token = (els.ghToken.value || "").trim();
+        if (!cfg.owner || !cfg.repo) {
+          els.ghError.textContent = "Owner and repository are required.";
+          return;
+        }
+        if (!token) {
+          els.ghError.textContent = "A Personal Access Token is required to save changes.";
+          return;
+        }
+        saveGhConfig(cfg);
+        setGhToken(token);
+        ghConnected = true;
+        els.ghError.textContent = "";
+        setSync("busy", "Connecting to GitHub…");
+        try {
+          const result = await ghFetchBoard();
+          if (result.missing) {
+            // Create board.json with current local state
+            await ghPushBoard();
+            setFileMsg("Connected — created board.json on GitHub.");
+          } else {
+            applySnapshot(result.data, "Live · GitHub");
+            setFileMsg("Connected to GitHub live board.");
+          }
+          startGitHubPolling();
+          closeGitHubModal();
+          setSync("ok", "Live · GitHub · " + clock());
+          if (els.githubConnectBtn) els.githubConnectBtn.textContent = "GitHub Connected ✓";
+        } catch (err) {
+          console.error(err);
+          els.ghError.textContent = err.message || String(err);
+          setSync("err", "GitHub connect failed");
+        }
+      }
+
+      function disconnectGitHub() {
+        setGhToken("");
+        ghConnected = false;
+        ghFileSha = null;
+        if (ghPollTimer) clearInterval(ghPollTimer);
+        if (els.githubConnectBtn) els.githubConnectBtn.textContent = "Connect GitHub";
+        setSync("ok", "Local board · " + clock());
+        setFileMsg("Disconnected. Token removed from this browser.");
+        closeGitHubModal();
+      }
+
+      async function bootLoad() {
+        // Prefer GitHub if configured (Pages URL auto-detects owner/repo)
+        const cfg = loadGhConfig();
+        const hasRepo = !!(cfg.owner && cfg.repo);
+        const token = getGhToken();
+        ghConnected = !!(hasRepo && token);
+
+        if (hasRepo) {
+          setSync("busy", "Loading board from GitHub…");
+          try {
+            const result = await ghFetchBoard();
+            if (!result.missing && result.data) {
+              applySnapshot(result.data, "Live · GitHub");
+              setFileMsg(
+                ghConnected
+                  ? "Live sync on. Changes save to GitHub automatically."
+                  : "Viewing live board (read-only). Click Connect GitHub to save your changes."
+              );
+            } else {
+              // No remote board yet — fall back to local/embedded
+              const embedded = readEmbeddedData();
+              if (embedded && (Array.isArray(embedded.tasks) || Array.isArray(embedded))) {
+                applySnapshot(embedded, "Loaded from page file");
+              } else {
+                tasks = loadBoardFromLocal();
+                savedTasks = loadSavedFromLocal();
+                boardUpdatedAt = Date.now();
+                writeEmbeddedData();
+                renderBoard();
+              }
+              setFileMsg(
+                "No board.json on GitHub yet. Connect with a token and add a task to create it."
+              );
+              setSync("ok", "GitHub repo ready · " + clock());
+            }
+            startGitHubPolling();
+            if (ghConnected && els.githubConnectBtn) {
+              els.githubConnectBtn.textContent = "GitHub Connected ✓";
+            }
+            return;
+          } catch (err) {
+            console.error(err);
+            setFileMsg("GitHub load failed: " + (err.message || err));
+            setSync("err", "GitHub load failed");
+          }
+        }
+
+        // Embedded data in this HTML file
         const embedded = readEmbeddedData();
         if (embedded && (Array.isArray(embedded.tasks) || Array.isArray(embedded))) {
           applySnapshot(embedded, "Loaded from page file");
           setFileMsg("Board data was embedded in this HTML file.");
           return;
         }
-        // 2) Browser localStorage
+        // Browser localStorage
         tasks = loadBoardFromLocal();
         savedTasks = loadSavedFromLocal();
         boardUpdatedAt = Date.now();
         writeEmbeddedData();
+        renderBoard();
         setSync("ok", "Local board · " + clock());
       }
 
@@ -1318,133 +1796,6 @@
             " task(s) inside. Put this HTML on OneDrive/Teams and share the link — open it to load the same board."
         );
         setSync("ok", "HTML board saved · " + clock());
-      }
-
-      let linkedSaveTimer = null;
-      function queueLinkedSave() {
-        if (!linkedFileHandle) return;
-        clearTimeout(linkedSaveTimer);
-        linkedSaveTimer = setTimeout(() => {
-          saveToLinkedFile().catch((err) => {
-            console.error(err);
-            setSync("err", "Shared file save failed");
-            setFileMsg("Could not write shared file: " + (err.message || err));
-          });
-        }, 400);
-      }
-
-      async function saveToLinkedFile() {
-        if (!linkedFileHandle) return;
-        writeEmbeddedData();
-        const payload = snapshot();
-        const json = JSON.stringify(payload, null, 2);
-        const writable = await linkedFileHandle.createWritable();
-        await writable.write(json);
-        await writable.close();
-        const file = await linkedFileHandle.getFile();
-        linkedLastModified = file.lastModified;
-        setSync("ok", "Live shared file · " + clock());
-      }
-
-      async function loadFromLinkedFile() {
-        if (!linkedFileHandle) return false;
-        const file = await linkedFileHandle.getFile();
-        if (file.lastModified === linkedLastModified && tasks.length) return false;
-        const text = await file.text();
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch {
-          // Maybe HTML with embedded JSON
-          const m = text.match(
-            /id=["']bingo-embedded-data["'][^>]*>([\s\S]*?)<\/script>/i
-          );
-          if (m && m[1] && m[1].trim() && m[1].trim() !== "null") {
-            data = JSON.parse(m[1].trim());
-          } else {
-            throw new Error("Shared file is not valid board JSON/HTML.");
-          }
-        }
-        linkedLastModified = file.lastModified;
-        const prevSig = tasks.map((t) => t.id + ":" + (t.completed ? "1" : "0")).join("|");
-        applySnapshot(data, "Synced from shared file");
-        const nextSig = tasks.map((t) => t.id + ":" + (t.completed ? "1" : "0")).join("|");
-        if (prevSig !== nextSig) {
-          setFileMsg("Board updated from shared file · " + clock());
-        }
-        return prevSig !== nextSig;
-      }
-
-      function startLinkedPolling() {
-        if (linkedPollTimer) clearInterval(linkedPollTimer);
-        linkedPollTimer = setInterval(() => {
-          if (document.hidden || !linkedFileHandle) return;
-          loadFromLinkedFile().catch(() => {});
-        }, 2000);
-        window.addEventListener("focus", () => {
-          if (linkedFileHandle) loadFromLinkedFile().catch(() => {});
-        });
-      }
-
-      async function linkSharedFile() {
-        // Prefer File System Access API (Chrome / Edge) — best for OneDrive live sync
-        if (window.showSaveFilePicker && window.showOpenFilePicker) {
-          const choice = window.confirm(
-            "Link a shared board file for live team updates.\n\n" +
-              "OK = Open an existing board JSON on OneDrive/network\n" +
-              "Cancel = Create a new board JSON file to share\n\n" +
-              "Tip: put the file in a Teams/OneDrive folder everyone can edit."
-          );
-          try {
-            if (choice) {
-              const handles = await window.showOpenFilePicker({
-                types: [
-                  {
-                    description: "Board JSON",
-                    accept: { "application/json": [".json"] },
-                  },
-                ],
-                multiple: false,
-              });
-              linkedFileHandle = handles[0];
-              await loadFromLinkedFile();
-            } else {
-              linkedFileHandle = await window.showSaveFilePicker({
-                suggestedName: "tonights-tasks-shared-board.json",
-                types: [
-                  {
-                    description: "Board JSON",
-                    accept: { "application/json": [".json"] },
-                  },
-                ],
-              });
-              await saveToLinkedFile();
-            }
-            startLinkedPolling();
-            setFileMsg(
-              "Linked shared file. Changes auto-save here; every 2s we check for teammate updates. Keep this tab open."
-            );
-            setSync("ok", "Live shared file · " + clock());
-            if (els.linkFileBtn) els.linkFileBtn.textContent = "Shared File Linked ✓";
-          } catch (err) {
-            if (err && err.name === "AbortError") {
-              setFileMsg("Link cancelled.");
-              return;
-            }
-            console.error(err);
-            setFileMsg("Could not link file: " + (err.message || err));
-          }
-          return;
-        }
-
-        // Fallback: classic file pick (import once — not live write)
-        setFileMsg(
-          "Live file linking needs Chrome or Edge. Use Save Board as HTML or Export/Import JSON instead."
-        );
-        alert(
-          "Live shared-file sync needs Chrome or Edge.\n\n" +
-            "Use:\n• Save Board as HTML (share that file on OneDrive)\n• or Export / Import JSON"
-        );
       }
 
       function normalizeImportedTask(t) {
@@ -1603,7 +1954,20 @@
       els.exportBtn.addEventListener("click", exportBoardFile);
       els.importBtn.addEventListener("click", openImportPicker);
       if (els.saveHtmlBtn) els.saveHtmlBtn.addEventListener("click", saveBoardAsHtml);
-      if (els.linkFileBtn) els.linkFileBtn.addEventListener("click", linkSharedFile);
+      if (els.githubConnectBtn) els.githubConnectBtn.addEventListener("click", openGitHubModal);
+      if (els.githubPullBtn) {
+        els.githubPullBtn.addEventListener("click", () => {
+          pullFromGitHub(false).catch((e) => alert(e.message || e));
+        });
+      }
+      if (els.ghCancelBtn) els.ghCancelBtn.addEventListener("click", closeGitHubModal);
+      if (els.ghSaveBtn) els.ghSaveBtn.addEventListener("click", saveGitHubConnection);
+      if (els.ghDisconnectBtn) els.ghDisconnectBtn.addEventListener("click", disconnectGitHub);
+      if (els.githubModal) {
+        els.githubModal.addEventListener("click", (e) => {
+          if (e.target === els.githubModal) closeGitHubModal();
+        });
+      }
       if (els.adminExportBtn) els.adminExportBtn.addEventListener("click", exportBoardFile);
       if (els.adminImportBtn) els.adminImportBtn.addEventListener("click", openImportPicker);
       els.importFileInput.addEventListener("change", function () {
@@ -2016,6 +2380,10 @@
 
       document.addEventListener("keydown", (e) => {
         if (e.key !== "Escape") return;
+        if (els.githubModal && els.githubModal.classList.contains("open")) {
+          closeGitHubModal();
+          return;
+        }
         if (els.quickAddModal.classList.contains("open")) {
           closeQuickAdd();
           return;
