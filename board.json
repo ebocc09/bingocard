@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784147682153,
+  "updatedAt": 1784147905103,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-15T20:34:42.153Z",
+  "exportedAt": "2026-07-15T20:38:25.103Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -28,6 +28,14 @@
       "completed": false,
       "createdAt": 1784147680980,
       "updatedAt": 1784147680980
+    },
+    {
+      "id": "t_mrmjlha0_gxbsls",
+      "name": "Clear Overflow",
+      "description": "Audit vehicles in overflow parking and kick out any vehicles with either no date, or a date 2+ days out.",
+      "completed": false,
+      "createdAt": 1784147903928,
+      "updatedAt": 1784147903928
     }
   ],
   "savedTasks": [
