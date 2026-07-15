@@ -1,14 +1,14 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784143854104,
-  "exportedAt": "2026-07-15T19:31:30.410Z",
+  "updatedAt": 1784143893822,
+  "exportedAt": "2026-07-15T19:31:34.786Z",
   "tasks": [
     {
       "id": "t_mrmh6oew_iq8kqc",
       "name": "test",
       "description": "test",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784143854104
     }
   ],
