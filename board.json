@@ -1,8 +1,8 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784143948491,
-  "exportedAt": "2026-07-15T19:32:29.493Z",
+  "updatedAt": 1784144014412,
+  "exportedAt": "2026-07-15T19:33:35.526Z",
   "tasks": [
     {
       "id": "t_mrmh6oew_iq8kqc",
@@ -17,6 +17,13 @@
       "description": "two",
       "completed": true,
       "createdAt": 1784143935975
+    },
+    {
+      "id": "t_mrmha43w_bnov3k",
+      "name": "plates",
+      "description": "audit plates",
+      "completed": false,
+      "createdAt": 1784144014412
     }
   ],
   "savedTasks": []
