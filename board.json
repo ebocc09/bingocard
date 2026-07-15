@@ -1,8 +1,8 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784143935975,
-  "exportedAt": "2026-07-15T19:32:24.568Z",
+  "updatedAt": 1784143948491,
+  "exportedAt": "2026-07-15T19:32:29.493Z",
   "tasks": [
     {
       "id": "t_mrmh6oew_iq8kqc",
@@ -15,7 +15,7 @@
       "id": "t_mrmh8fl3_ljksry",
       "name": "one",
       "description": "two",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784143935975
     }
   ],
