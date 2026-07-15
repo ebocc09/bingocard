@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784147676911,
+  "updatedAt": 1784147682153,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-15T20:34:36.911Z",
+  "exportedAt": "2026-07-15T20:34:42.153Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -20,6 +20,14 @@
       "completed": false,
       "createdAt": 1784147161081,
       "updatedAt": 1784147161081
+    },
+    {
+      "id": "t_mrmjgp90_enmwx9",
+      "name": "Box Audit",
+      "description": "Take all the keys from the offsite key drop off box and post a photo in the teams chat to confirm keys have been grabbed.",
+      "completed": false,
+      "createdAt": 1784147680980,
+      "updatedAt": 1784147680980
     }
   ],
   "savedTasks": [
