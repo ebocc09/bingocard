@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784147162476,
+  "updatedAt": 1784147676911,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-15T20:26:02.476Z",
+  "exportedAt": "2026-07-15T20:34:36.911Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -24,16 +24,22 @@
   ],
   "savedTasks": [
     {
-      "id": "s_mrmj0vz6_gfqsa2",
-      "name": "Plate Audit",
-      "description": "Gather all the plates in a consolidated area and post a photo of all the plates in the teams chat prior to marking this task completed",
-      "createdAt": 1784146943202
+      "id": "s_mrmjgl7l_3aeuo9",
+      "name": "Box Audit",
+      "description": "Take all the keys from the offsite key drop off box and post a photo in the teams chat to confirm keys have been grabbed.",
+      "createdAt": 1784147675745
     },
     {
       "id": "s_mrmj43b5_hy9b1w",
       "name": "Loaner Audit",
       "description": "Using Mission Control via garage, filter for service loaners in Cypress and verify there are no loaners stored at offsite. If there are any loaners stored at offsite, quickly retrieve them before marking this task completed.",
       "createdAt": 1784147092673
+    },
+    {
+      "id": "s_mrmj0vz6_gfqsa2",
+      "name": "Plate Audit",
+      "description": "Gather all the plates in a consolidated area and post a photo of all the plates in the teams chat prior to marking this task completed",
+      "createdAt": 1784146943202
     }
   ]
 }
