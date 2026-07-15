@@ -379,11 +379,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0.45;
+      opacity: 0.22;
       transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .admin-access:hover {
+    .admin-access:hover,
+    .admin-access:focus {
       opacity: 1;
       transform: scale(1.08);
       box-shadow: 0 0 12px rgba(184, 134, 11, 0.4);
@@ -396,6 +397,7 @@
       background: rgba(10, 5, 2, 0.75);
       backdrop-filter: blur(3px);
       display: none;
+      visibility: hidden;
       align-items: center;
       justify-content: center;
       padding: 1rem;
@@ -403,6 +405,7 @@
 
     .modal-overlay.open {
       display: flex;
+      visibility: visible;
       animation: fade-in 0.2s ease;
     }
 
@@ -823,55 +826,9 @@
       font-weight: 700;
     }
 
-    .file-bar {
-      margin-top: 1.25rem;
-      padding: 0.85rem 1rem;
-      background: rgba(40, 20, 10, 0.55);
-      border: 1px solid rgba(184, 134, 11, 0.35);
-      border-radius: 4px;
-      text-align: center;
-    }
-
-    .file-bar p {
-      font-family: "Special Elite", monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(212, 168, 75, 0.7);
-      margin-bottom: 0.65rem;
-      line-height: 1.4;
-    }
-
-    .file-bar .modal-actions {
-      margin-top: 0;
-    }
-
-    .file-bar .btn {
-      font-size: 0.68rem;
-      padding: 0.5rem 0.85rem;
-      border-color: var(--gold);
-      background: transparent;
-      color: var(--gold-light);
-    }
-
-    .file-bar .btn:hover {
-      background: var(--blood);
-      border-color: var(--blood);
-      color: #fff;
-    }
-
-    .file-bar .file-msg {
-      margin-top: 0.55rem;
-      min-height: 1.1em;
-      font-family: "IM Fell English", serif;
-      font-style: italic;
-      font-size: 0.85rem;
-      color: rgba(232, 213, 181, 0.75);
-    }
-
     .footer-note {
       text-align: center;
-      margin-top: 1rem;
+      margin-top: 1.25rem;
       font-family: "Special Elite", monospace;
       font-size: 0.65rem;
       letter-spacing: 0.15em;
@@ -1071,11 +1028,14 @@
       const ADMIN_PASSWORD = "salem1692";
 
       /**
-       * GitHub live sync defaults (auto-filled from github.io when possible).
-       * Everyone loads/polls board.json. Saving requires a PAT (Connect GitHub).
+       * GitHub live sync defaults.
+       * Leave owner/repo blank to auto-detect on github.io Pages.
+       * You can hardcode them so local file:// and Pages behave the same:
+       *   owner: "YourGitHubUser",
+       *   repo: "YourRepoName",
        */
       const GITHUB_DEFAULTS = {
-        owner: "", // e.g. "myuser"
+        owner: "", // e.g. "myuser" — set this so local + Pages both hit the same board
         repo: "", // e.g. "bingo-card"
         path: "board.json",
         branch: "main",
@@ -1811,7 +1771,7 @@
               setFileMsg(
                 ghConnected
                   ? "Live sync on. Changes save to GitHub automatically."
-                  : "Viewing live board (read-only). Click Connect GitHub to save your changes."
+                  : "Viewing live board from GitHub. Admin → Connect GitHub to enable saving from this browser."
               );
             } else {
               // No remote board yet — fall back to local/embedded
