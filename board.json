@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784148022014,
+  "updatedAt": 1784148280695,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-15T20:40:22.014Z",
+  "exportedAt": "2026-07-15T20:44:40.695Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -36,9 +36,35 @@
       "completed": false,
       "createdAt": 1784147903928,
       "updatedAt": 1784147903928
+    },
+    {
+      "id": "t_mrmjtjuw_ogfwnc",
+      "name": "Clear Trade-in Parking",
+      "description": "Open up every space in the trade-in parking zone.",
+      "completed": false,
+      "createdAt": 1784148280520,
+      "updatedAt": 1784148280520
     }
   ],
   "savedTasks": [
+    {
+      "id": "s_mrmjtizk_dq7s7k",
+      "name": "Clear Trade-in Parking",
+      "description": "Open up every space in the trade-in parking zone.",
+      "createdAt": 1784148279392
+    },
+    {
+      "id": "s_mrmj0vz6_gfqsa2",
+      "name": "Plate Audit",
+      "description": "Gather all the plates in a consolidated area and post a photo of all the plates in the teams chat prior to marking this task completed",
+      "createdAt": 1784146943202
+    },
+    {
+      "id": "s_mrmj43b5_hy9b1w",
+      "name": "Loaner Audit",
+      "description": "Using Mission Control via garage, filter for service loaners in Cypress and verify there are no loaners stored at offsite. If there are any loaners stored at offsite, quickly retrieve them before marking this task completed.",
+      "createdAt": 1784147092673
+    },
     {
       "id": "s_mrmjnzh3_rai5t9",
       "name": "Clear Overflow",
@@ -50,18 +76,6 @@
       "name": "Box Audit",
       "description": "Take all the keys from the offsite key drop off box and post a photo in the teams chat to confirm keys have been grabbed.",
       "createdAt": 1784147675745
-    },
-    {
-      "id": "s_mrmj43b5_hy9b1w",
-      "name": "Loaner Audit",
-      "description": "Using Mission Control via garage, filter for service loaners in Cypress and verify there are no loaners stored at offsite. If there are any loaners stored at offsite, quickly retrieve them before marking this task completed.",
-      "createdAt": 1784147092673
-    },
-    {
-      "id": "s_mrmj0vz6_gfqsa2",
-      "name": "Plate Audit",
-      "description": "Gather all the plates in a consolidated area and post a photo of all the plates in the teams chat prior to marking this task completed",
-      "createdAt": 1784146943202
     }
   ]
 }
