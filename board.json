@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784177470047,
+  "updatedAt": 1784181077826,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-16T04:51:10.047Z",
+  "exportedAt": "2026-07-16T05:51:17.827Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -17,9 +17,9 @@
       "id": "t_mrmj5k3d_154rpu",
       "name": "Loaner Audit",
       "description": "Using Mission Control via garage, filter for service loaners in Cypress and verify there are no loaners stored at offsite. If there are any loaners stored at offsite, quickly retrieve them before marking this task completed.",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784147161081,
-      "updatedAt": 1784147161081
+      "updatedAt": 1784181076488
     },
     {
       "id": "t_mrmjgp90_enmwx9",
