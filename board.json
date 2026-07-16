@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784236553807,
+  "updatedAt": 1784236559794,
   "boardGeneration": 0,
-  "exportedAt": "2026-07-16T21:15:53.807Z",
+  "exportedAt": "2026-07-16T21:15:59.795Z",
   "tasks": [
     {
       "id": "t_mro0cpql_59gt8p",
@@ -36,6 +36,14 @@
       "completed": false,
       "createdAt": 1784236551657,
       "updatedAt": 1784236551657
+    },
+    {
+      "id": "t_mro0dnfv_ou3d7f",
+      "name": "Clear Trade-in Parking",
+      "description": "",
+      "completed": false,
+      "createdAt": 1784236558315,
+      "updatedAt": 1784236558315
     }
   ],
   "savedTasks": [],
