@@ -1,17 +1,17 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784237022004,
+  "updatedAt": 1784239964250,
   "boardGeneration": 0,
-  "exportedAt": "2026-07-16T21:23:42.005Z",
+  "exportedAt": "2026-07-16T22:12:44.250Z",
   "tasks": [
     {
       "id": "t_mro0cpql_59gt8p",
       "name": "Plate Audit",
       "description": "",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784236514637,
-      "updatedAt": 1784236514637
+      "updatedAt": 1784239963080
     },
     {
       "id": "t_mro0ctp4_i8vtnv",
@@ -72,6 +72,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_mro2emkp_sg5vkz",
+      "at": 1784239963081,
+      "email": "gabe@tesla.com",
+      "action": "complete",
+      "taskId": "t_mro0cpql_59gt8p",
+      "taskName": "Plate Audit"
+    },
     {
       "id": "a_mro0nk90_118dnq",
       "at": 1784237020740,
