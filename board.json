@@ -1,91 +1,10 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784182254627,
-  "boardGeneration": 1,
-  "exportedAt": "2026-07-16T06:10:54.628Z",
-  "tasks": [
-    {
-      "id": "t_mrmj5jha_nc7fl1",
-      "name": "Plate Audit",
-      "description": "Gather all the plates in a consolidated area and post a photo of all the plates in the teams chat prior to marking this task completed",
-      "completed": true,
-      "createdAt": 1784147160286,
-      "updatedAt": 1784182253317
-    },
-    {
-      "id": "t_mrmj5k3d_154rpu",
-      "name": "Loaner Audit",
-      "description": "Using Mission Control via garage, filter for service loaners in Cypress and verify there are no loaners stored at offsite. If there are any loaners stored at offsite, quickly retrieve them before marking this task completed.",
-      "completed": true,
-      "createdAt": 1784147161081,
-      "updatedAt": 1784181076488
-    },
-    {
-      "id": "t_mrmjgp90_enmwx9",
-      "name": "Box Audit",
-      "description": "Take all the keys from the offsite key drop off box and post a photo in the teams chat to confirm keys have been grabbed.",
-      "completed": true,
-      "createdAt": 1784147680980,
-      "updatedAt": 1784165932130
-    },
-    {
-      "id": "t_mrmjlha0_gxbsls",
-      "name": "Clear Overflow",
-      "description": "Audit vehicles in overflow parking and kick out any vehicles with either no date, or a date 2+ days out.",
-      "completed": true,
-      "createdAt": 1784147903928,
-      "updatedAt": 1784159379442
-    },
-    {
-      "id": "t_mrmjtjuw_ogfwnc",
-      "name": "Clear Trade-in Parking",
-      "description": "Open up every space in the trade-in parking zone.",
-      "completed": true,
-      "createdAt": 1784148280520,
-      "updatedAt": 1784164652708
-    },
-    {
-      "id": "t_mrmjy8zy_dk6g78",
-      "name": "Pull and Charge next days cars",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784148499726,
-      "updatedAt": 1784165840030
-    },
-    {
-      "id": "t_mrmjz1y5_eegu2g",
-      "name": "Pull-Onsite all cars for the day after tomorrow",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784148537245,
-      "updatedAt": 1784177468802
-    },
-    {
-      "id": "t_mrmkfu69_oahi2e",
-      "name": "Sync test",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784149320321,
-      "updatedAt": 1784149637711
-    },
-    {
-      "id": "t_mrmlbg3q_3r2362",
-      "name": "For nick",
-      "description": "L",
-      "completed": true,
-      "createdAt": 1784150795078,
-      "updatedAt": 1784150814205
-    },
-    {
-      "id": "t_mrmyd5tn_hp54ho",
-      "name": "Organize 529 offsite",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784172710075,
-      "updatedAt": 1784181085202
-    }
-  ],
+  "updatedAt": 1784235435962,
+  "boardGeneration": 2,
+  "exportedAt": "2026-07-16T20:57:15.962Z",
+  "tasks": [],
   "savedTasks": [
     {
       "id": "s_mrmjtizk_dq7s7k",
