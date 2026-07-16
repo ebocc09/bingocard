@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784159380643,
+  "updatedAt": 1784164653885,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-15T23:49:40.643Z",
+  "exportedAt": "2026-07-16T01:17:33.885Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -41,9 +41,9 @@
       "id": "t_mrmjtjuw_ogfwnc",
       "name": "Clear Trade-in Parking",
       "description": "Open up every space in the trade-in parking zone.",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784148280520,
-      "updatedAt": 1784148280520
+      "updatedAt": 1784164652708
     },
     {
       "id": "t_mrmjy8zy_dk6g78",
