@@ -1,17 +1,17 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784181086432,
+  "updatedAt": 1784182254627,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-16T05:51:26.432Z",
+  "exportedAt": "2026-07-16T06:10:54.628Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
       "name": "Plate Audit",
       "description": "Gather all the plates in a consolidated area and post a photo of all the plates in the teams chat prior to marking this task completed",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784147160286,
-      "updatedAt": 1784147160286
+      "updatedAt": 1784182253317
     },
     {
       "id": "t_mrmj5k3d_154rpu",
