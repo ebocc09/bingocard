@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784236687847,
+  "updatedAt": 1784237019699,
   "boardGeneration": 0,
-  "exportedAt": "2026-07-16T21:18:07.847Z",
+  "exportedAt": "2026-07-16T21:23:39.700Z",
   "tasks": [
     {
       "id": "t_mro0cpql_59gt8p",
@@ -60,6 +60,14 @@
       "completed": true,
       "createdAt": 1784236684032,
       "updatedAt": 1784236686453
+    },
+    {
+      "id": "t_mro0nigv_jhfsgs",
+      "name": "Test",
+      "description": "",
+      "completed": false,
+      "createdAt": 1784237018431,
+      "updatedAt": 1784237018431
     }
   ],
   "savedTasks": [],
