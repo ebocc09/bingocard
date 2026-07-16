@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784235484185,
+  "updatedAt": 1784235591778,
   "boardGeneration": 2,
-  "exportedAt": "2026-07-16T20:58:04.186Z",
+  "exportedAt": "2026-07-16T20:59:51.778Z",
   "tasks": [
     {
       "id": "t_mrnzppr3_70ry7f",
@@ -44,6 +44,14 @@
       "completed": false,
       "createdAt": 1784235482960,
       "updatedAt": 1784235482960
+    },
+    {
+      "id": "t_mrnzswlc_mmdgmf",
+      "name": "Loaner Audit (EoD)",
+      "description": "",
+      "completed": false,
+      "createdAt": 1784235590400,
+      "updatedAt": 1784235590400
     }
   ],
   "savedTasks": [
