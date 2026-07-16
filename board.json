@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784235454105,
+  "updatedAt": 1784235484185,
   "boardGeneration": 2,
-  "exportedAt": "2026-07-16T20:57:34.105Z",
+  "exportedAt": "2026-07-16T20:58:04.186Z",
   "tasks": [
     {
       "id": "t_mrnzppr3_70ry7f",
@@ -36,6 +36,14 @@
       "completed": false,
       "createdAt": 1784235452773,
       "updatedAt": 1784235452773
+    },
+    {
+      "id": "t_mrnzqlow_5efq36",
+      "name": "Pull + Charge all cars for Saturday",
+      "description": "",
+      "completed": false,
+      "createdAt": 1784235482960,
+      "updatedAt": 1784235482960
     }
   ],
   "savedTasks": [
