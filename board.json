@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784236581041,
+  "updatedAt": 1784236685779,
   "boardGeneration": 0,
-  "exportedAt": "2026-07-16T21:16:21.041Z",
+  "exportedAt": "2026-07-16T21:18:05.779Z",
   "tasks": [
     {
       "id": "t_mro0cpql_59gt8p",
@@ -52,6 +52,14 @@
       "completed": false,
       "createdAt": 1784236578114,
       "updatedAt": 1784236578114
+    },
+    {
+      "id": "t_mro0gcg0_g3qaat",
+      "name": "TestForSync",
+      "description": "",
+      "completed": false,
+      "createdAt": 1784236684032,
+      "updatedAt": 1784236684032
     }
   ],
   "savedTasks": [],
