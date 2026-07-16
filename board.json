@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784236685779,
+  "updatedAt": 1784236687847,
   "boardGeneration": 0,
-  "exportedAt": "2026-07-16T21:18:05.779Z",
+  "exportedAt": "2026-07-16T21:18:07.847Z",
   "tasks": [
     {
       "id": "t_mro0cpql_59gt8p",
@@ -57,11 +57,20 @@
       "id": "t_mro0gcg0_g3qaat",
       "name": "TestForSync",
       "description": "",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784236684032,
-      "updatedAt": 1784236684032
+      "updatedAt": 1784236686453
     }
   ],
   "savedTasks": [],
-  "auditLog": []
+  "auditLog": [
+    {
+      "id": "a_mro0geb9_ip3hv8",
+      "at": 1784236686453,
+      "email": "ebocchini@tesla.com",
+      "action": "complete",
+      "taskId": "t_mro0gcg0_g3qaat",
+      "taskName": "TestForSync"
+    }
+  ]
 }
