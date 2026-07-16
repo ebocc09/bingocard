@@ -274,6 +274,95 @@
       touch-action: manipulation;
     }
     .admin-access:hover, .admin-access:focus { opacity: 1; }
+
+    .user-access {
+      position: fixed;
+      bottom: calc(0.85rem + var(--safe-bottom));
+      left: 0.85rem;
+      z-index: 50;
+      max-width: min(70vw, 240px);
+      min-height: 42px;
+      border-radius: 999px;
+      border: 1px solid rgba(184, 134, 11, 0.4);
+      background: rgba(40, 20, 10, 0.82);
+      color: var(--gold-light);
+      font-family: "Special Elite", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.55rem 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      touch-action: manipulation;
+      opacity: 0.92;
+    }
+    .user-access:hover, .user-access:focus { opacity: 1; border-color: var(--gold); }
+    .user-access .user-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #888;
+      flex-shrink: 0;
+    }
+    .user-access.signed-in .user-dot { background: #8fbf6a; box-shadow: 0 0 6px rgba(140, 190, 100, 0.7); }
+    .user-access .user-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .audit-list {
+      list-style: none;
+      max-height: min(50dvh, 360px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 0.5rem;
+    }
+    .audit-list li {
+      padding: 0.65rem 0.5rem;
+      border-bottom: 1px solid rgba(100, 70, 40, 0.22);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+    .audit-list li .audit-who {
+      font-family: "Cinzel", serif;
+      font-weight: 600;
+      color: var(--blood);
+      word-break: break-all;
+    }
+    .audit-list li .audit-what { margin-top: 0.15rem; }
+    .audit-list li .audit-when {
+      margin-top: 0.2rem;
+      font-family: "Special Elite", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.04em;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+    }
+    .audit-empty {
+      text-align: center;
+      font-style: italic;
+      color: var(--ink-soft);
+      padding: 1.25rem 0.5rem;
+      list-style: none;
+    }
+    .code-inputs {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .code-inputs input {
+      width: 2.6rem !important;
+      text-align: center;
+      font-size: 1.25rem !important;
+      font-family: "Special Elite", monospace !important;
+      letter-spacing: 0.05em;
+      margin-bottom: 0 !important;
+      padding: 0.55rem 0.2rem !important;
+    }
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -624,7 +713,68 @@
   </div>
 
   <input type="file" id="importFileInput" class="hidden-file" accept=".json,application/json,.html,text/html" />
+  <button type="button" class="user-access" id="userAccessBtn" title="Sign in with Tesla email" aria-label="Sign in">
+    <span class="user-dot" aria-hidden="true"></span>
+    <span class="user-label" id="userAccessLabel">Sign in</span>
+  </button>
   <button type="button" class="admin-access" id="adminAccessBtn" title="Admin" aria-label="Admin">🗝️</button>
+
+  <!-- User sign-in / email verify -->
+  <div class="modal-overlay" id="signInModal" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2 id="signInTitle">Sign In</h2>
+      <p class="sub" id="signInSub">Use your Tesla email to verify. Completions are recorded in the audit log.</p>
+
+      <div id="signInStepEmail">
+        <label for="signInEmail">Tesla email</label>
+        <input type="email" id="signInEmail" placeholder="you@tesla.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" />
+        <div class="error" id="signInError"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" id="signInCancelBtn">Cancel</button>
+          <button type="button" class="btn" id="sendCodeBtn">Send Code</button>
+        </div>
+      </div>
+
+      <div id="signInStepCode" hidden>
+        <label>Verification code</label>
+        <div class="code-inputs" id="codeInputs">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+        </div>
+        <div class="error" id="codeError"></div>
+        <div class="hint-msg" id="codeHint"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn secondary" id="resendCodeBtn">Resend</button>
+          <button type="button" class="btn" id="verifyCodeBtn">Verify</button>
+        </div>
+      </div>
+
+      <div id="signInStepDone" hidden>
+        <p class="sub" id="signedInAs">Signed in.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn danger" id="signOutBtn">Sign Out</button>
+          <button type="button" class="btn secondary" id="signInDoneCloseBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audit log (admin) -->
+  <div class="modal-overlay nested" id="auditModal" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2>Audit Log</h2>
+      <p class="sub">Who completed which tasks.</p>
+      <ul class="audit-list" id="auditList"></ul>
+      <div class="modal-actions">
+        <button type="button" class="btn danger" id="clearAuditBtn">Clear Log</button>
+        <button type="button" class="btn secondary" id="auditCloseBtn">Back</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Task note -->
   <div class="modal-overlay note-overlay center-modal" id="noteModal" role="dialog" aria-modal="true">
@@ -695,6 +845,9 @@
         <button type="button" class="btn secondary" id="importBtn">Import JSON</button>
         <button type="button" class="btn secondary" id="saveHtmlBtn">Save as HTML</button>
       </div>
+      <div class="modal-actions" style="margin-bottom:0.5rem">
+        <button type="button" class="btn secondary" id="auditLogBtn">Audit Log</button>
+      </div>
       <div class="hint-msg" id="fileMsg"></div>
 
       <hr class="admin-divider" />
@@ -753,7 +906,6 @@
 
       /**
        * Hardcode owner/repo so local + GitHub Pages hit the same board.json.
-       * Example: owner: "myuser", repo: "bingo-card"
        * Leave blank to auto-detect on *.github.io
        */
       const GITHUB_DEFAULTS = {
@@ -764,10 +916,26 @@
         pollMs: 3500,
       };
 
+      /**
+       * Email verification (OTP) via EmailJS — free at https://www.emailjs.com/
+       * Template variables: to_email, passcode, app_name
+       * If keys are empty, demo mode shows the code on screen (for testing only).
+       */
+      const EMAIL_CONFIG = {
+        publicKey: "",
+        serviceId: "",
+        templateId: "",
+        allowedDomains: ["tesla.com"],
+        codeTtlMs: 10 * 60 * 1000,
+        /** true = if EmailJS is not configured, show code on screen so you can still test */
+        allowDemoCode: true,
+      };
+
       const BOARD_KEY = "bingo-card-board-v1";
       const SAVED_KEY = "bingo-card-saved-v1";
       const GH_CFG_KEY = "bingo-github-config-v1";
       const GH_TOKEN_KEY = "bingo-github-token-v1";
+      const USER_SESSION_KEY = "bingo-user-session-v1";
       const FILE_VERSION = 1;
 
       const $ = (id) => document.getElementById(id);
@@ -825,10 +993,42 @@
         importFileInput: $("importFileInput"),
         fileMsg: $("fileMsg"),
         embeddedData: $("bingo-embedded-data"),
+        userAccessBtn: $("userAccessBtn"),
+        userAccessLabel: $("userAccessLabel"),
+        signInModal: $("signInModal"),
+        signInTitle: $("signInTitle"),
+        signInSub: $("signInSub"),
+        signInStepEmail: $("signInStepEmail"),
+        signInStepCode: $("signInStepCode"),
+        signInStepDone: $("signInStepDone"),
+        signInEmail: $("signInEmail"),
+        signInError: $("signInError"),
+        signInCancelBtn: $("signInCancelBtn"),
+        sendCodeBtn: $("sendCodeBtn"),
+        codeInputs: $("codeInputs"),
+        codeError: $("codeError"),
+        codeHint: $("codeHint"),
+        resendCodeBtn: $("resendCodeBtn"),
+        verifyCodeBtn: $("verifyCodeBtn"),
+        signedInAs: $("signedInAs"),
+        signOutBtn: $("signOutBtn"),
+        signInDoneCloseBtn: $("signInDoneCloseBtn"),
+        auditModal: $("auditModal"),
+        auditList: $("auditList"),
+        auditLogBtn: $("auditLogBtn"),
+        clearAuditBtn: $("clearAuditBtn"),
+        auditCloseBtn: $("auditCloseBtn"),
       };
 
       let tasks = [];
       let savedTasks = [];
+      /** @type {Array<{id:string,at:number,email:string,action:string,taskId:string,taskName:string}>} */
+      let auditLog = [];
+      /** @type {{ email: string, verifiedAt: number } | null} */
+      let currentUser = loadUserSession();
+      /** @type {{ email: string, code: string, expires: number } | null} */
+      let pendingOtp = null;
+      let pendingCompleteTaskId = null;
       let noteTaskId = null;
       let boardUpdatedAt = 0;
       let boardGeneration = 0;
@@ -917,7 +1117,146 @@
           exportedAt: new Date().toISOString(),
           tasks: tasks,
           savedTasks: savedTasks,
+          auditLog: auditLog,
         };
+      }
+
+      function loadUserSession() {
+        try {
+          const raw = localStorage.getItem(USER_SESSION_KEY);
+          if (!raw) return null;
+          const u = JSON.parse(raw);
+          if (!u || !u.email) return null;
+          return { email: String(u.email).toLowerCase(), verifiedAt: u.verifiedAt || Date.now() };
+        } catch {
+          return null;
+        }
+      }
+
+      function saveUserSession(user) {
+        currentUser = user;
+        if (user) localStorage.setItem(USER_SESSION_KEY, JSON.stringify(user));
+        else localStorage.removeItem(USER_SESSION_KEY);
+        updateUserAccessUi();
+      }
+
+      function updateUserAccessUi() {
+        if (!els.userAccessBtn || !els.userAccessLabel) return;
+        if (currentUser && currentUser.email) {
+          els.userAccessBtn.classList.add("signed-in");
+          els.userAccessLabel.textContent = currentUser.email;
+          els.userAccessBtn.title = "Signed in as " + currentUser.email;
+        } else {
+          els.userAccessBtn.classList.remove("signed-in");
+          els.userAccessLabel.textContent = "Sign in";
+          els.userAccessBtn.title = "Sign in with Tesla email";
+        }
+      }
+
+      function isAllowedEmail(email) {
+        const e = String(email || "").trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return false;
+        const domain = e.split("@")[1] || "";
+        return (EMAIL_CONFIG.allowedDomains || ["tesla.com"]).some(
+          (d) => domain === d.toLowerCase() || domain.endsWith("." + d.toLowerCase())
+        );
+      }
+
+      function generateOtp() {
+        const n = Math.floor(100000 + Math.random() * 900000);
+        return String(n);
+      }
+
+      async function sendOtpEmail(email, code) {
+        const cfg = EMAIL_CONFIG;
+        if (cfg.publicKey && cfg.serviceId && cfg.templateId) {
+          const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              service_id: cfg.serviceId,
+              template_id: cfg.templateId,
+              user_id: cfg.publicKey,
+              template_params: {
+                to_email: email,
+                passcode: code,
+                app_name: "Tonight's Tasks Bingo",
+              },
+            }),
+          });
+          if (!res.ok) {
+            const t = await res.text().catch(() => "");
+            throw new Error("Email send failed (" + res.status + ") " + t.slice(0, 120));
+          }
+          return { demo: false };
+        }
+        if (cfg.allowDemoCode) {
+          return { demo: true };
+        }
+        throw new Error(
+          "Email service is not configured. Admin must add EmailJS keys in EMAIL_CONFIG (see EMAIL-SETUP.md)."
+        );
+      }
+
+      function normalizeAuditList(arr) {
+        if (!Array.isArray(arr)) return [];
+        return arr
+          .filter((a) => a && a.id && a.email && a.action)
+          .map((a) => ({
+            id: String(a.id),
+            at: typeof a.at === "number" ? a.at : Date.now(),
+            email: String(a.email).toLowerCase(),
+            action: String(a.action),
+            taskId: a.taskId != null ? String(a.taskId) : "",
+            taskName: a.taskName != null ? String(a.taskName) : "",
+          }))
+          .sort((a, b) => (b.at || 0) - (a.at || 0));
+      }
+
+      function addAuditEntry(entry) {
+        auditLog.unshift({
+          id: uid("a"),
+          at: Date.now(),
+          email: entry.email,
+          action: entry.action,
+          taskId: entry.taskId || "",
+          taskName: entry.taskName || "",
+        });
+        // keep last 500
+        if (auditLog.length > 500) auditLog = auditLog.slice(0, 500);
+      }
+
+      function renderAuditList() {
+        if (!els.auditList) return;
+        els.auditList.innerHTML = "";
+        if (!auditLog.length) {
+          els.auditList.innerHTML = '<li class="audit-empty">No completions recorded yet.</li>';
+          return;
+        }
+        auditLog.forEach((a) => {
+          const li = document.createElement("li");
+          const when = new Date(a.at).toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+          });
+          const actionLabel =
+            a.action === "complete"
+              ? "completed"
+              : a.action === "board_reset"
+                ? "reset the board"
+                : a.action;
+          li.innerHTML =
+            '<div class="audit-who"></div><div class="audit-what"></div><div class="audit-when"></div>';
+          li.querySelector(".audit-who").textContent = a.email;
+          li.querySelector(".audit-what").textContent =
+            a.action === "complete"
+              ? "Completed: " + (a.taskName || a.taskId || "task")
+              : actionLabel;
+          li.querySelector(".audit-when").textContent = when;
+          els.auditList.appendChild(li);
+        });
       }
 
       function readEmbeddedData() {
@@ -973,6 +1312,9 @@
         tasks = normalizeTaskList(Array.isArray(data) ? data : data.tasks);
         if (!Array.isArray(data) && Array.isArray(data.savedTasks)) {
           savedTasks = normalizeSavedList(data.savedTasks);
+        }
+        if (!Array.isArray(data) && Array.isArray(data.auditLog)) {
+          auditLog = normalizeAuditList(data.auditLog);
         }
         boardUpdatedAt = typeof data.updatedAt === "number" ? data.updatedAt : Date.now();
         if (typeof data.boardGeneration === "number") boardGeneration = data.boardGeneration;
@@ -1044,6 +1386,16 @@
           savedTasks = Array.from(savedMap.values());
         }
 
+        // Merge audit log by id (union)
+        if (Array.isArray(remote.auditLog)) {
+          const auditMap = new Map();
+          auditLog.forEach((a) => auditMap.set(a.id, a));
+          normalizeAuditList(remote.auditLog).forEach((a) => {
+            if (!auditMap.has(a.id)) auditMap.set(a.id, a);
+          });
+          auditLog = Array.from(auditMap.values()).sort((a, b) => (b.at || 0) - (a.at || 0));
+        }
+
         boardUpdatedAt = Math.max(
           boardUpdatedAt || 0,
           typeof remote.updatedAt === "number" ? remote.updatedAt : 0,
@@ -1062,7 +1414,7 @@
           renderBoard();
           return true;
         }
-        return false;
+        return Array.isArray(remote.auditLog);
       }
 
       // —— GitHub ——
@@ -1658,9 +2010,27 @@
         const id = noteTaskId;
         const task = tasks.find((t) => t.id === id);
         if (!task || task.completed) return;
+
+        if (!currentUser || !currentUser.email) {
+          pendingCompleteTaskId = id;
+          closeNote();
+          openSignInModal();
+          if (els.signInSub) {
+            els.signInSub.textContent =
+              "Sign in with your Tesla email before completing a task (for the audit log).";
+          }
+          return;
+        }
+
         els.noteCompleteBtn.disabled = true;
         task.completed = true;
         task.updatedAt = Date.now();
+        addAuditEntry({
+          email: currentUser.email,
+          action: "complete",
+          taskId: task.id,
+          taskName: task.name,
+        });
         saveBoard();
         fillNote(id);
         els.noteStatus.textContent = "Sealed · complete";
@@ -1781,6 +2151,14 @@
         tasks = [];
         boardUpdatedAt = Date.now();
         localDirty = true;
+        if (currentUser && currentUser.email) {
+          addAuditEntry({
+            email: currentUser.email,
+            action: "board_reset",
+            taskId: "",
+            taskName: "",
+          });
+        }
         saveBoard();
         renderBoard();
         if (ghConnected && getGhToken()) {
@@ -1984,11 +2362,205 @@
 
       document.addEventListener("keydown", (e) => {
         if (e.key !== "Escape") return;
+        if (els.auditModal.classList.contains("open")) return els.auditModal.classList.remove("open");
         if (els.githubModal.classList.contains("open")) return closeGitHubModal();
         if (els.quickAddModal.classList.contains("open")) return closeQuickAdd();
+        if (els.signInModal.classList.contains("open")) return closeSignInModal();
         if (els.noteModal.classList.contains("open")) return closeNote();
         if (els.passwordModal.classList.contains("open")) return closePasswordModal();
         if (els.adminModal.classList.contains("open")) return closeAdminModal();
+      });
+
+      // —— Sign-in / OTP ——
+      function showSignInStep(step) {
+        els.signInStepEmail.hidden = step !== "email";
+        els.signInStepCode.hidden = step !== "code";
+        els.signInStepDone.hidden = step !== "done";
+        if (step === "email") {
+          els.signInTitle.textContent = "Sign In";
+          els.signInSub.textContent =
+            "Use your Tesla email to verify. Completions are recorded in the audit log.";
+        } else if (step === "code") {
+          els.signInTitle.textContent = "Enter Code";
+          els.signInSub.textContent = "We sent a 6-digit code to your email.";
+        } else {
+          els.signInTitle.textContent = "Signed In";
+          els.signInSub.textContent = "Your completions will be attributed to this email.";
+        }
+      }
+
+      function clearCodeInputs() {
+        const inputs = els.codeInputs.querySelectorAll("input");
+        inputs.forEach((inp) => {
+          inp.value = "";
+        });
+        if (inputs[0]) inputs[0].focus();
+      }
+
+      function readCodeInputs() {
+        return Array.from(els.codeInputs.querySelectorAll("input"))
+          .map((i) => i.value.replace(/\D/g, ""))
+          .join("");
+      }
+
+      function openSignInModal() {
+        els.signInError.textContent = "";
+        els.codeError.textContent = "";
+        els.codeHint.textContent = "";
+        if (currentUser && currentUser.email) {
+          els.signedInAs.textContent = "Signed in as " + currentUser.email;
+          showSignInStep("done");
+        } else {
+          showSignInStep("email");
+          setTimeout(() => els.signInEmail.focus(), 80);
+        }
+        els.signInModal.classList.add("open");
+      }
+
+      function closeSignInModal() {
+        els.signInModal.classList.remove("open");
+      }
+
+      async function sendVerificationCode() {
+        const email = (els.signInEmail.value || "").trim().toLowerCase();
+        els.signInError.textContent = "";
+        if (!isAllowedEmail(email)) {
+          els.signInError.textContent =
+            "Enter a valid Tesla email (@" +
+            (EMAIL_CONFIG.allowedDomains || ["tesla.com"]).join(", @") +
+            ").";
+          return;
+        }
+        els.sendCodeBtn.disabled = true;
+        try {
+          const code = generateOtp();
+          pendingOtp = {
+            email: email,
+            code: code,
+            expires: Date.now() + (EMAIL_CONFIG.codeTtlMs || 600000),
+          };
+          const result = await sendOtpEmail(email, code);
+          showSignInStep("code");
+          clearCodeInputs();
+          if (result.demo) {
+            els.codeHint.textContent =
+              "Demo mode (EmailJS not configured). Your code is: " + code;
+          } else {
+            els.codeHint.textContent = "Code sent to " + email + ". Check inbox / spam.";
+          }
+        } catch (err) {
+          els.signInError.textContent = err.message || String(err);
+          pendingOtp = null;
+        } finally {
+          els.sendCodeBtn.disabled = false;
+        }
+      }
+
+      function verifyCode() {
+        els.codeError.textContent = "";
+        const code = readCodeInputs();
+        if (!pendingOtp) {
+          els.codeError.textContent = "No code pending. Go back and send a new one.";
+          return;
+        }
+        if (Date.now() > pendingOtp.expires) {
+          els.codeError.textContent = "Code expired. Resend a new one.";
+          return;
+        }
+        if (code.length !== 6) {
+          els.codeError.textContent = "Enter all 6 digits.";
+          return;
+        }
+        if (code !== pendingOtp.code) {
+          els.codeError.textContent = "Incorrect code. Try again.";
+          return;
+        }
+        saveUserSession({ email: pendingOtp.email, verifiedAt: Date.now() });
+        pendingOtp = null;
+        els.signedInAs.textContent = "Signed in as " + currentUser.email;
+        showSignInStep("done");
+
+        // Continue pending complete if any
+        if (pendingCompleteTaskId) {
+          const id = pendingCompleteTaskId;
+          pendingCompleteTaskId = null;
+          closeSignInModal();
+          openNote(id);
+          // Auto-complete after short beat so they see the note
+          setTimeout(() => {
+            if (noteTaskId === id) completeFromNote();
+          }, 200);
+        }
+      }
+
+      function signOut() {
+        saveUserSession(null);
+        pendingOtp = null;
+        closeSignInModal();
+      }
+
+      // OTP digit inputs UX
+      (function wireCodeInputs() {
+        const inputs = els.codeInputs.querySelectorAll("input");
+        inputs.forEach((input, idx) => {
+          input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, "").slice(0, 1);
+            if (input.value && inputs[idx + 1]) inputs[idx + 1].focus();
+            if (readCodeInputs().length === 6) verifyCode();
+          });
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && !input.value && inputs[idx - 1]) {
+              inputs[idx - 1].focus();
+            }
+          });
+          input.addEventListener("paste", (e) => {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData)
+              .getData("text")
+              .replace(/\D/g, "")
+              .slice(0, 6);
+            text.split("").forEach((ch, i) => {
+              if (inputs[i]) inputs[i].value = ch;
+            });
+            if (text.length === 6) verifyCode();
+            else if (inputs[text.length]) inputs[text.length].focus();
+          });
+        });
+      })();
+
+      els.userAccessBtn.addEventListener("click", openSignInModal);
+      els.signInCancelBtn.addEventListener("click", closeSignInModal);
+      els.sendCodeBtn.addEventListener("click", sendVerificationCode);
+      els.resendCodeBtn.addEventListener("click", () => {
+        showSignInStep("email");
+        els.signInError.textContent = "";
+      });
+      els.verifyCodeBtn.addEventListener("click", verifyCode);
+      els.signOutBtn.addEventListener("click", signOut);
+      els.signInDoneCloseBtn.addEventListener("click", closeSignInModal);
+      els.signInModal.addEventListener("click", (e) => {
+        if (e.target === els.signInModal) closeSignInModal();
+      });
+      els.signInEmail.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          sendVerificationCode();
+        }
+      });
+
+      els.auditLogBtn.addEventListener("click", () => {
+        renderAuditList();
+        els.auditModal.classList.add("open");
+      });
+      els.auditCloseBtn.addEventListener("click", () => els.auditModal.classList.remove("open"));
+      els.clearAuditBtn.addEventListener("click", () => {
+        if (!confirm("Clear the entire audit log for everyone?")) return;
+        auditLog = [];
+        saveBoard();
+        renderAuditList();
+      });
+      els.auditModal.addEventListener("click", (e) => {
+        if (e.target === els.auditModal) els.auditModal.classList.remove("open");
       });
 
       // Resume polling when returning to the tab (mobile backgrounding)
@@ -2008,13 +2580,13 @@
         }
       });
       window.addEventListener("pageshow", (e) => {
-        // iOS bfcache restore
         if (e.persisted) {
           const cfg = loadGhConfig();
           if (cfg.owner && cfg.repo) pullFromGitHub(true);
         }
       });
 
+      updateUserAccessUi();
       bootLoad().catch((err) => {
         console.error(err);
         tasks = loadBoardFromLocal();
