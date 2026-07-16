@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784165933442,
+  "updatedAt": 1784172711339,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-16T01:38:53.442Z",
+  "exportedAt": "2026-07-16T03:31:51.339Z",
   "tasks": [
     {
       "id": "t_mrmj5jha_nc7fl1",
@@ -76,6 +76,14 @@
       "completed": true,
       "createdAt": 1784150795078,
       "updatedAt": 1784150814205
+    },
+    {
+      "id": "t_mrmyd5tn_hp54ho",
+      "name": "Organize 529 offsite",
+      "description": "",
+      "completed": false,
+      "createdAt": 1784172710075,
+      "updatedAt": 1784172710075
     }
   ],
   "savedTasks": [
