@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784261597382,
+  "updatedAt": 1784266975730,
   "boardGeneration": 0,
-  "exportedAt": "2026-07-17T04:13:17.382Z",
+  "exportedAt": "2026-07-17T05:42:55.731Z",
   "tasks": [
     {
       "id": "t_mro0cpql_59gt8p",
@@ -25,9 +25,9 @@
       "id": "t_mro0dekh_wymh1b",
       "name": "Loaner Audit EoD",
       "description": "",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784236546817,
-      "updatedAt": 1784236546817
+      "updatedAt": 1784266974397
     },
     {
       "id": "t_mro0diax_7fyxg3",
@@ -72,6 +72,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_mroihkn1_4ddavt",
+      "at": 1784266974397,
+      "email": "eric@tesla.com",
+      "action": "complete",
+      "taskId": "t_mro0dekh_wymh1b",
+      "taskName": "Loaner Audit EoD"
+    },
     {
       "id": "a_mrofa9vd_4613w7",
       "at": 1784261595001,
