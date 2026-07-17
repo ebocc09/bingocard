@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784239964250,
+  "updatedAt": 1784258858715,
   "boardGeneration": 0,
-  "exportedAt": "2026-07-16T22:12:44.250Z",
+  "exportedAt": "2026-07-17T03:27:38.715Z",
   "tasks": [
     {
       "id": "t_mro0cpql_59gt8p",
@@ -41,9 +41,9 @@
       "id": "t_mro0dnfv_ou3d7f",
       "name": "Clear Trade-in Parking",
       "description": "",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784236558315,
-      "updatedAt": 1784236558315
+      "updatedAt": 1784258857434
     },
     {
       "id": "t_mro0e2pu_91sdg9",
@@ -72,6 +72,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_mrodnlju_fq1c2z",
+      "at": 1784258857434,
+      "email": "gabe@tesla.com",
+      "action": "complete",
+      "taskId": "t_mro0dnfv_ou3d7f",
+      "taskName": "Clear Trade-in Parking"
+    },
     {
       "id": "a_mro2emkp_sg5vkz",
       "at": 1784239963081,
