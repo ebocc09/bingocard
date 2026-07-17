@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784258858715,
+  "updatedAt": 1784261596272,
   "boardGeneration": 0,
-  "exportedAt": "2026-07-17T03:27:38.715Z",
+  "exportedAt": "2026-07-17T04:13:16.272Z",
   "tasks": [
     {
       "id": "t_mro0cpql_59gt8p",
@@ -33,9 +33,9 @@
       "id": "t_mro0diax_7fyxg3",
       "name": "Box Audit",
       "description": "",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784236551657,
-      "updatedAt": 1784236551657
+      "updatedAt": 1784261595001
     },
     {
       "id": "t_mro0dnfv_ou3d7f",
@@ -72,6 +72,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_mrofa9vd_4613w7",
+      "at": 1784261595001,
+      "email": "gabe@tesla.com",
+      "action": "complete",
+      "taskId": "t_mro0diax_7fyxg3",
+      "taskName": "Box Audit"
+    },
     {
       "id": "a_mrodnlju_fq1c2z",
       "at": 1784258857434,
