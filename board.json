@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784271531220,
+  "updatedAt": 1784602319142,
   "boardGeneration": 0,
-  "exportedAt": "2026-07-17T06:58:51.220Z",
+  "exportedAt": "2026-07-21T02:51:59.142Z",
   "tasks": [
     {
       "id": "t_mro0cpql_59gt8p",
@@ -49,9 +49,9 @@
       "id": "t_mro0e2pu_91sdg9",
       "name": "Pull + Charge all cars for Saturday",
       "description": "",
-      "completed": false,
+      "completed": true,
       "createdAt": 1784236578114,
-      "updatedAt": 1784236578114
+      "updatedAt": 1784602317912
     },
     {
       "id": "t_mro0gcg0_g3qaat",
@@ -72,6 +72,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_mru255co_ng0h7q",
+      "at": 1784602317912,
+      "email": "gabe@tesla.com",
+      "action": "complete",
+      "taskId": "t_mro0e2pu_91sdg9",
+      "taskName": "Pull + Charge all cars for Saturday"
+    },
     {
       "id": "a_mrol77s5_9b1tna",
       "at": 1784271530022,
