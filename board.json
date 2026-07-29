@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339571492,
+  "updatedAt": 1785339572750,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:39:31.695Z",
+  "exportedAt": "2026-07-29T15:39:32.751Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -65,9 +65,9 @@
       "id": "t_ms690keu_pdetyq",
       "name": "Laundry",
       "description": "Pickup all left over towels and complete laundry loads",
-      "completed": false,
+      "completed": true,
       "createdAt": 1785339455574,
-      "updatedAt": 1785339455574
+      "updatedAt": 1785339572327
     },
     {
       "id": "t_ms690rqo_prhiw1",
@@ -80,6 +80,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_ms6932hz_wifnir",
+      "at": 1785339572327,
+      "email": "ebocchini@tesla.com",
+      "action": "complete",
+      "taskId": "t_ms690keu_pdetyq",
+      "taskName": "Laundry"
+    },
     {
       "id": "a_ms6931gl_pzufhu",
       "at": 1785339570981,
