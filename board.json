@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339338551,
+  "updatedAt": 1785339385003,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:35:38.551Z",
+  "exportedAt": "2026-07-29T15:36:25.003Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -36,6 +36,14 @@
       "completed": false,
       "createdAt": 1785339336914,
       "updatedAt": 1785339336914
+    },
+    {
+      "id": "t_ms68z10q_lkmbc8",
+      "name": "Pull cars",
+      "description": "Pull and charge 100% of the cars for the 30th",
+      "completed": false,
+      "createdAt": 1785339383786,
+      "updatedAt": 1785339383786
     }
   ],
   "savedTasks": [],
