@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339385003,
+  "updatedAt": 1785339413575,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:36:25.003Z",
+  "exportedAt": "2026-07-29T15:36:53.575Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -44,6 +44,14 @@
       "completed": false,
       "createdAt": 1785339383786,
       "updatedAt": 1785339383786
+    },
+    {
+      "id": "t_ms68zmi1_xbve2c",
+      "name": "Line up Displauy",
+      "description": "Fix display and clear trade in vehicles from trade zone",
+      "completed": false,
+      "createdAt": 1785339411625,
+      "updatedAt": 1785339411625
     }
   ],
   "savedTasks": [],
