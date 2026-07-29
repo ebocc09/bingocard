@@ -1,77 +1,20 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1784602323040,
-  "boardGeneration": 0,
-  "exportedAt": "2026-07-21T02:52:03.040Z",
-  "tasks": [
-    {
-      "id": "t_mro0cpql_59gt8p",
-      "name": "Plate Audit",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784236514637,
-      "updatedAt": 1784239963080
-    },
-    {
-      "id": "t_mro0ctp4_i8vtnv",
-      "name": "Plate Audit EoD",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784236519768,
-      "updatedAt": 1784271530021
-    },
-    {
-      "id": "t_mro0dekh_wymh1b",
-      "name": "Loaner Audit EoD",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784236546817,
-      "updatedAt": 1784266974397
-    },
-    {
-      "id": "t_mro0diax_7fyxg3",
-      "name": "Box Audit",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784236551657,
-      "updatedAt": 1784261595001
-    },
-    {
-      "id": "t_mro0dnfv_ou3d7f",
-      "name": "Clear Trade-in Parking",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784236558315,
-      "updatedAt": 1784258857434
-    },
-    {
-      "id": "t_mro0e2pu_91sdg9",
-      "name": "Pull + Charge all cars for Saturday",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784236578114,
-      "updatedAt": 1784602321838
-    },
-    {
-      "id": "t_mro0gcg0_g3qaat",
-      "name": "TestForSync",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784236684032,
-      "updatedAt": 1784236686453
-    },
-    {
-      "id": "t_mro0nigv_jhfsgs",
-      "name": "Test",
-      "description": "",
-      "completed": true,
-      "createdAt": 1784237018431,
-      "updatedAt": 1784237020740
-    }
-  ],
+  "updatedAt": 1785338827586,
+  "boardGeneration": 1,
+  "exportedAt": "2026-07-29T15:27:07.586Z",
+  "tasks": [],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_ms68n3os_z43zh7",
+      "at": 1785338827372,
+      "email": "ebocchini@tesla.com",
+      "action": "board_reset",
+      "taskId": "",
+      "taskName": ""
+    },
     {
       "id": "a_mru258dq_3h4wox",
       "at": 1784602321838,
