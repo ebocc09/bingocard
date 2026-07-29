@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339536540,
+  "updatedAt": 1785339537979,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:38:56.540Z",
+  "exportedAt": "2026-07-29T15:38:57.979Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -33,9 +33,9 @@
       "id": "t_ms68y0uq_g87pwl",
       "name": "Key Box audit",
       "description": "Check and empty drop off box",
-      "completed": false,
+      "completed": true,
       "createdAt": 1785339336914,
-      "updatedAt": 1785339336914
+      "updatedAt": 1785339536689
     },
     {
       "id": "t_ms68z10q_lkmbc8",
@@ -80,6 +80,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_ms692b01_9z8cxl",
+      "at": 1785339536689,
+      "email": "ebocchini@tesla.com",
+      "action": "complete",
+      "taskId": "t_ms68y0uq_g87pwl",
+      "taskName": "Key Box audit"
+    },
     {
       "id": "a_ms6929y9_hn8945",
       "at": 1785339535329,
