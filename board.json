@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339537979,
+  "updatedAt": 1785339568580,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:38:57.979Z",
+  "exportedAt": "2026-07-29T15:39:28.580Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -41,9 +41,9 @@
       "id": "t_ms68z10q_lkmbc8",
       "name": "Pull cars",
       "description": "Pull and charge 100% of the cars for the 30th",
-      "completed": false,
+      "completed": true,
       "createdAt": 1785339383786,
-      "updatedAt": 1785339383786
+      "updatedAt": 1785339567333
     },
     {
       "id": "t_ms68zmi1_xbve2c",
@@ -80,6 +80,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_ms692yn9_smqg77",
+      "at": 1785339567333,
+      "email": "ebocchini@tesla.com",
+      "action": "complete",
+      "taskId": "t_ms68z10q_lkmbc8",
+      "taskName": "Pull cars"
+    },
     {
       "id": "a_ms692b01_9z8cxl",
       "at": 1785339536689,
