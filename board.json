@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339568580,
+  "updatedAt": 1785339569790,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:39:28.580Z",
+  "exportedAt": "2026-07-29T15:39:29.790Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -49,9 +49,9 @@
       "id": "t_ms68zmi1_xbve2c",
       "name": "Line up Displauy",
       "description": "Fix display and clear trade in vehicles from trade zone",
-      "completed": false,
+      "completed": true,
       "createdAt": 1785339411625,
-      "updatedAt": 1785339411625
+      "updatedAt": 1785339569537
     },
     {
       "id": "t_ms68zxxc_ivmwye",
@@ -80,6 +80,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_ms6930ch_r14vlf",
+      "at": 1785339569537,
+      "email": "ebocchini@tesla.com",
+      "action": "complete",
+      "taskId": "t_ms68zmi1_xbve2c",
+      "taskName": "Line up Displauy"
+    },
     {
       "id": "a_ms692yn9_smqg77",
       "at": 1785339567333,
