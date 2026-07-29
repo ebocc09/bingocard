@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339428614,
+  "updatedAt": 1785339456818,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:37:08.614Z",
+  "exportedAt": "2026-07-29T15:37:36.836Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -60,6 +60,14 @@
       "completed": false,
       "createdAt": 1785339426432,
       "updatedAt": 1785339426432
+    },
+    {
+      "id": "t_ms690keu_pdetyq",
+      "name": "Laundry",
+      "description": "Pickup all left over towels and complete laundry loads",
+      "completed": false,
+      "createdAt": 1785339455574,
+      "updatedAt": 1785339455574
     }
   ],
   "savedTasks": [],
