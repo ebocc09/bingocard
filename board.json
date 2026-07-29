@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785338913995,
+  "updatedAt": 1785339008302,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:28:33.995Z",
+  "exportedAt": "2026-07-29T15:30:08.302Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -12,6 +12,14 @@
       "completed": true,
       "createdAt": 1785338846514,
       "updatedAt": 1785338912769
+    },
+    {
+      "id": "t_ms68qych_6y6yby",
+      "name": "Loaner Audit",
+      "description": "",
+      "completed": false,
+      "createdAt": 1785339007073,
+      "updatedAt": 1785339007073
     }
   ],
   "savedTasks": [],
