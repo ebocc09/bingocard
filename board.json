@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339482700,
+  "updatedAt": 1785339536540,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:38:02.701Z",
+  "exportedAt": "2026-07-29T15:38:56.540Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -25,9 +25,9 @@
       "id": "t_ms68wjbc_ga0ya9",
       "name": "Test",
       "description": "",
-      "completed": false,
+      "completed": true,
       "createdAt": 1785339267528,
-      "updatedAt": 1785339267528
+      "updatedAt": 1785339535329
     },
     {
       "id": "t_ms68y0uq_g87pwl",
@@ -80,6 +80,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_ms6929y9_hn8945",
+      "at": 1785339535329,
+      "email": "ebocchini@tesla.com",
+      "action": "complete",
+      "taskId": "t_ms68wjbc_ga0ya9",
+      "taskName": "Test"
+    },
     {
       "id": "a_ms69146h_zjhw4b",
       "at": 1785339481193,
