@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339569790,
+  "updatedAt": 1785339571492,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:39:29.790Z",
+  "exportedAt": "2026-07-29T15:39:31.695Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -57,9 +57,9 @@
       "id": "t_ms68zxxc_ivmwye",
       "name": "Trash",
       "description": "Clean and remove all trash from deluvery zone",
-      "completed": false,
+      "completed": true,
       "createdAt": 1785339426432,
-      "updatedAt": 1785339426432
+      "updatedAt": 1785339570981
     },
     {
       "id": "t_ms690keu_pdetyq",
@@ -80,6 +80,14 @@
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_ms6931gl_pzufhu",
+      "at": 1785339570981,
+      "email": "ebocchini@tesla.com",
+      "action": "complete",
+      "taskId": "t_ms68zxxc_ivmwye",
+      "taskName": "Trash"
+    },
     {
       "id": "a_ms6930ch_r14vlf",
       "at": 1785339569537,
