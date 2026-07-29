@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339456818,
+  "updatedAt": 1785339466286,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:37:36.836Z",
+  "exportedAt": "2026-07-29T15:37:46.286Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -68,6 +68,14 @@
       "completed": false,
       "createdAt": 1785339455574,
       "updatedAt": 1785339455574
+    },
+    {
+      "id": "t_ms690rqo_prhiw1",
+      "name": "Demo Duties",
+      "description": "Complete 3 demo washes",
+      "completed": false,
+      "createdAt": 1785339465072,
+      "updatedAt": 1785339465072
     }
   ],
   "savedTasks": [],
