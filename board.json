@@ -1,9 +1,9 @@
 {
   "app": "tonights-tasks-bingo",
   "version": 1,
-  "updatedAt": 1785339572750,
+  "updatedAt": 1785339573965,
   "boardGeneration": 1,
-  "exportedAt": "2026-07-29T15:39:32.751Z",
+  "exportedAt": "2026-07-29T15:39:33.965Z",
   "tasks": [
     {
       "id": "t_ms68nigi_wumb6c",
@@ -73,13 +73,21 @@
       "id": "t_ms690rqo_prhiw1",
       "name": "Demo Duties",
       "description": "Complete 3 demo washes",
-      "completed": false,
+      "completed": true,
       "createdAt": 1785339465072,
-      "updatedAt": 1785339465072
+      "updatedAt": 1785339573708
     }
   ],
   "savedTasks": [],
   "auditLog": [
+    {
+      "id": "a_ms6933kc_y4asfi",
+      "at": 1785339573708,
+      "email": "ebocchini@tesla.com",
+      "action": "complete",
+      "taskId": "t_ms690rqo_prhiw1",
+      "taskName": "Demo Duties"
+    },
     {
       "id": "a_ms6932hz_wifnir",
       "at": 1785339572327,
